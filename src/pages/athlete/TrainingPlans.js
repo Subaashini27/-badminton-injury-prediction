@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { useAnalysis } from '../../context/AnalysisContext';
 
 const TrainingPlans = () => {
@@ -24,7 +23,7 @@ const TrainingPlans = () => {
       setCurrentPlan(defaultPlans[0]);
       localStorage.setItem('trainingPlans', JSON.stringify(defaultPlans));
     }
-  }, [analysisResults]);
+  }, [analysisResults, generateDefaultPlans]);
 
   useEffect(() => {
     loadTrainingPlans();
@@ -40,7 +39,7 @@ const TrainingPlans = () => {
     }
   };
 
-  const generateDefaultPlans = () => {
+  const generateDefaultPlans = useCallback(() => {
     const riskLevel = analysisResults?.riskLevel || 'low';
     
     const plans = [
@@ -135,7 +134,7 @@ const TrainingPlans = () => {
     }
 
     return plans;
-  };
+  }, [analysisResults]);
 
   const markExerciseComplete = (planId, exerciseId) => {
     const key = `${planId}-${exerciseId}`;

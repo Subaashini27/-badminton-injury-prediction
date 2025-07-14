@@ -18,7 +18,6 @@ import { useAnalysis } from '../../context/AnalysisContext';
  * - Comprehensive risk scoring
  */
 const InjuryAssessment = () => {
-  const { currentUser } = useAuth();
   const { metrics, metricsHistory, updateAssessment } = useAnalysis();
   
   // Enhanced state management for professional assessment
@@ -32,7 +31,6 @@ const InjuryAssessment = () => {
   });
   const [isCompleted, setIsCompleted] = useState(false);
   const [assessmentResults, setAssessmentResults] = useState(null);
-  const [showDetailedReport, setShowDetailedReport] = useState(false);
 
   /**
    * Professional Assessment Categories with Medical-Grade Questions
@@ -470,7 +468,7 @@ const InjuryAssessment = () => {
     if (!riskData) return [];
 
     const recommendations = [];
-    const { categoryScores, finalRiskScore, riskLevel } = riskData;
+    const { categoryScores, finalRiskScore } = riskData;
 
     // High-priority recommendations based on category scores
     Object.entries(categoryScores).forEach(([categoryId, categoryData]) => {
@@ -634,7 +632,6 @@ const InjuryAssessment = () => {
     });
     setIsCompleted(false);
     setAssessmentResults(null);
-    setShowDetailedReport(false);
   };
 
   /**

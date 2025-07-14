@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { coachAPI } from '../../services/api';
 
@@ -80,7 +80,7 @@ const CoachInjuryReports = () => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [newStatus, setNewStatus] = useState('');
 
-  const fetchInjuryReports = async (isManualRefresh = false) => {
+  const fetchInjuryReports = useCallback(async (isManualRefresh = false) => {
     if (!currentUser?.id) {
       setLoading(false);
       return;
@@ -110,11 +110,11 @@ const CoachInjuryReports = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchInjuryReports();
-  }, [currentUser]);
+  }, [fetchInjuryReports]);
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
@@ -126,7 +126,7 @@ const CoachInjuryReports = () => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [loading, isRefreshing, useFallbackData]);
+  }, [loading, isRefreshing, useFallbackData, fetchInjuryReports]);
 
   const handleManualRefresh = () => {
     fetchInjuryReports(true);

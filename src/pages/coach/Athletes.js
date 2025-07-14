@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { coachAPI } from '../../services/api';
 
@@ -86,7 +86,7 @@ const CoachAthletes = () => {
   const [addError, setAddError] = useState('');
   const [addLoading, setAddLoading] = useState(false);
 
-  const fetchAthletes = async (isManualRefresh = false) => {
+  const fetchAthletes = useCallback(async (isManualRefresh = false) => {
     if (!currentUser?.id) {
       setLoading(false);
       return;
@@ -117,11 +117,11 @@ const CoachAthletes = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchAthletes();
-  }, [currentUser]);
+  }, [fetchAthletes]);
 
   // Auto-refresh every 30 seconds
   useEffect(() => {

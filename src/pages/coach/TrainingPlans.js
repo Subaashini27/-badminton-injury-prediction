@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { coachAPI } from '../../services/api';
 
@@ -23,24 +23,18 @@ const CoachTrainingPlans = () => {
     exercises: []
   });
 
-  useEffect(() => {
+  const loadInitialData = useCallback(async () => {
     if (currentUser?.id) {
-      loadInitialData();
-    }
-  }, [currentUser]);
-
-  const loadInitialData = async () => {
-    try {
       await Promise.all([
         loadTrainingPlans(),
         loadAthletes()
       ]);
-    } catch (err) {
-      // setError(err.message); // This line was removed as per the edit hint
-    } finally {
-      // setLoading(false); // This line was removed as per the edit hint
     }
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   const loadTrainingPlans = async () => {
     try {

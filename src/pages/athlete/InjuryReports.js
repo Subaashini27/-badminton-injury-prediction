@@ -3,8 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useAnalysis } from '../../context/AnalysisContext';
 
 const InjuryReports = () => {
-  const { user } = useAuth();
-  const { analysisResults, metricsHistory } = useAnalysis();
+  const { analysisResults } = useAnalysis();
   const metrics = analysisResults?.metrics;
   const riskLevel = analysisResults?.riskLevel;
   const [injuryReports, setInjuryReports] = useState([]);

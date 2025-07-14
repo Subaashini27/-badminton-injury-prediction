@@ -1,5 +1,5 @@
 // src/pages/dashboards/CoachDashboard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ReportGenerationService from '../../services/ReportGenerationService';
 import TrainingPlanAdjustmentService from '../../services/TrainingPlanAdjustmentService';
@@ -34,7 +34,7 @@ const CoachDashboard = () => {
     if (currentUser?.id) {
     fetchTeamData();
     }
-  }, [currentUser]);
+  }, [currentUser, fetchTeamData]);
 
   useEffect(() => {
     // Update notifications based on team data
@@ -70,9 +70,9 @@ const CoachDashboard = () => {
       generateTrainingAdjustments();
       generateDecisionSupport();
     }
-  }, [teamData]);
+  }, [teamData, generateAIInsights, generateTrainingAdjustments, generateDecisionSupport]);
 
-  const fetchTeamData = async () => {
+  const fetchTeamData = useCallback(async () => {
     if (!currentUser?.id) return;
 
     // For seamless presentation, use mock data immediately
@@ -135,12 +135,12 @@ const CoachDashboard = () => {
       ],
       riskDistribution: { high: 1, medium: 1, low: 1 },
       recentAnalyses: [],
-      pendingAlerts: []
+      pendingAlerts: [      ]
     });
-  };
+  }, [currentUser]);
 
   // Generate AI insights for the team
-  const generateAIInsights = () => {
+  const generateAIInsights = useCallback(() => {
     const insights = [];
 
     // Analyze team risk patterns
@@ -192,10 +192,10 @@ const CoachDashboard = () => {
     }
 
     setAiInsights(insights);
-  };
+  }, [teamData]);
 
   // Generate training adjustments for athletes
-  const generateTrainingAdjustments = () => {
+  const generateTrainingAdjustments = useCallback(() => {
     const adjustments = [];
 
     teamData.athletes.forEach(athlete => {
@@ -217,13 +217,13 @@ const CoachDashboard = () => {
     });
 
     setTrainingAdjustments(adjustments);
-  };
+  }, [teamData]);
 
   // Generate decision support for coaching decisions
-  const generateDecisionSupport = () => {
+  const generateDecisionSupport = useCallback(() => {
     const teamDecisions = DecisionSupportService.generateTeamDecisions(teamData);
     setDecisionSupport(teamDecisions);
-  };
+  }, [teamData]);
 
   // Generate automated reports
   const generateAutomatedReport = async (reportType) => {
@@ -271,7 +271,7 @@ const CoachDashboard = () => {
           throw new Error('Unknown report type');
       }
 
-      const filename = await ReportGenerationService.exportToPDF(reportType, reportData);
+      await ReportGenerationService.exportToPDF(reportType, reportData);
       
       // setAutomatedReports(prev => [...prev, {
       //   id: Date.now(),

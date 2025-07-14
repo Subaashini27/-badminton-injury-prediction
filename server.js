@@ -67,10 +67,11 @@ app.get('/api/test-db', async (req, res) => {
 // Initialize database and start server
 initializeDatabase().then(() => {
   app.listen(PORT, () => {
-    app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
     console.log(`Health check: http://localhost:${PORT}/api/health`);
     console.log(`API Base URL: http://localhost:${PORT}/api`);
   });
 }).catch(error => {
+  console.error('Failed to initialize database:', error);
   process.exit(1);
 }); 

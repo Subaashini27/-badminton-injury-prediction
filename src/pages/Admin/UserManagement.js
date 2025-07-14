@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -25,9 +25,32 @@ const UserManagement = () => {
     loadUsers();
   }, []);
 
+  const applyFilters = useCallback(() => {
+    let filtered = users;
+    
+    if (filters.role !== 'all') {
+      filtered = filtered.filter(user => user.role === filters.role);
+    }
+    
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(user => 
+        filters.status === 'active' ? user.isActive : !user.isActive
+      );
+    }
+    
+    if (filters.search) {
+      filtered = filtered.filter(user => 
+        user.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+        user.email.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
+    
+    setFilteredUsers(filtered);
+  }, [users, filters]);
+
   useEffect(() => {
     applyFilters();
-  }, [users, filters, applyFilters]);
+  }, [applyFilters]);
 
   const loadUsers = () => {
     setIsLoading(true);
@@ -121,31 +144,6 @@ const UserManagement = () => {
 
     setUsers(mockUsers);
     setIsLoading(false);
-  };
-
-  const applyFilters = () => {
-    let filtered = [...users];
-
-    // Filter by role
-    if (filters.role !== 'all') {
-      filtered = filtered.filter(user => user.role === filters.role);
-    }
-
-    // Filter by status
-    if (filters.status !== 'all') {
-      filtered = filtered.filter(user => user.status === filters.status);
-    }
-
-    // Filter by search term
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(searchTerm) ||
-        user.email.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    setFilteredUsers(filtered);
   };
 
   const handleFilterChange = (key, value) => {
