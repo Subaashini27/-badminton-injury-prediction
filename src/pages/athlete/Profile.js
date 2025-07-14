@@ -91,7 +91,7 @@ const Profile = () => {
       newErrors['emergencyContact.phone'] = 'Emergency contact phone is required';
     }
     // Fix unnecessary escape characters in phoneRegex
-    const phoneRegex = /^[0-9\-+()\s.]{7,20}$/;
+    const phoneRegex = /^[0-9\-+()\\s.]{7,20}$/;
     if (formData.emergencyContact.phone && !phoneRegex.test(formData.emergencyContact.phone)) {
       newErrors['emergencyContact.phone'] = 'Invalid phone number format';
     }

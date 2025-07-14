@@ -31,8 +31,6 @@ ChartJS.register(
 );
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
-  const { analysisResults } = useAnalysis();
   const [systemStats, setSystemStats] = useState(null);
   const [modelPerformance, setModelPerformance] = useState(null);
   const [userActivity, setUserActivity] = useState(null);

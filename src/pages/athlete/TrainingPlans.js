@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalysis } from '../../context/AnalysisContext';
 
@@ -10,12 +10,7 @@ const TrainingPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [completedSessions, setCompletedSessions] = useState({});
 
-  useEffect(() => {
-    loadTrainingPlans();
-    loadCompletedSessions();
-  }, [analysisResults]);
-
-  const loadTrainingPlans = () => {
+  const loadTrainingPlans = useCallback(() => {
     // Load from localStorage or generate based on user profile
     const savedPlans = localStorage.getItem('trainingPlans');
     if (savedPlans) {
@@ -29,7 +24,14 @@ const TrainingPlans = () => {
       setCurrentPlan(defaultPlans[0]);
       localStorage.setItem('trainingPlans', JSON.stringify(defaultPlans));
     }
-  };
+  }, [analysisResults]);
+
+  useEffect(() => {
+    loadTrainingPlans();
+    loadCompletedSessions();
+  }, [loadTrainingPlans]);
+
+
 
   const loadCompletedSessions = () => {
     const saved = localStorage.getItem('completedSessions');

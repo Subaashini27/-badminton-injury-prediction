@@ -38,7 +38,7 @@ const CoachProfile = () => {
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) newErrors.email = 'Invalid email address';
-    if (formData.phone && !/^[0-9\-\+\(\)\s\.]{7,20}$/.test(formData.phone)) newErrors.phone = 'Invalid phone number';
+    if (formData.phone && !/^[0-9\-+()\\s.]{7,20}$/.test(formData.phone)) newErrors.phone = 'Invalid phone number';
     if (formData.experience && (isNaN(formData.experience) || formData.experience < 0 || formData.experience > 60)) newErrors.experience = 'Experience must be between 0 and 60 years';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
