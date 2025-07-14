@@ -103,35 +103,31 @@ def process_dataset(batch_size=50):
                     pose_data_list.append(pose_data)
                     labels.append(label)
         
-        # Save intermediate results after each batch
-        if pose_data_list:
-            # Create column names for the DataFrame
-            columns = []
-            for j in range(len(pose_data_list[0]) // 4):  # 4 values per landmark (x, y, z, visibility)
-                columns.extend([
-                    f'landmark_{j}_x',
-                    f'landmark_{j}_y',
-                    f'landmark_{j}_z',
-                    f'landmark_{j}_visibility'
-                ])
-            
-            # Create DataFrame
-            df = pd.DataFrame(pose_data_list, columns=columns)
-            df['label'] = labels
-            
-            # Save to CSV
-            output_path = os.path.join(os.path.dirname(__file__), 'mediapipe_dataset.csv')
-            df.to_csv(output_path, index=False)
-            print(f"\nIntermediate results saved to: {output_path}")
-            print(f"Processed {len(df)} samples so far")
-        
         # Add a small delay between batches to prevent overheating
         time.sleep(1)
-    
-    # Final save
+
+    # Save results after all batches are processed
     if pose_data_list:
+        # Create column names for the DataFrame
+        columns = []
+        for j in range(len(pose_data_list[0]) // 4):  # 4 values per landmark (x, y, z, visibility)
+            columns.extend([
+                f'landmark_{j}_x',
+                f'landmark_{j}_y',
+                f'landmark_{j}_z',
+                f'landmark_{j}_visibility'
+            ])
+        
+        # Create DataFrame
+        df = pd.DataFrame(pose_data_list, columns=columns)
+        df['label'] = labels
+        
+        # Save to CSV
+        output_path = os.path.join(os.path.dirname(__file__), 'mediapipe_dataset.csv')
+        df.to_csv(output_path, index=False)
+        
         print(f"\nProcessing complete!")
-        print(f"Total samples processed: {len(pose_data_list)}")
+        print(f"Total samples processed: {len(df)}")
         print(f"Dataset saved to: {output_path}")
     else:
         print("No valid pose data was extracted from the images.")

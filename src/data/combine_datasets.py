@@ -26,17 +26,21 @@ def load_mediapipe_dataset(mediapipe_path):
 
 def load_google_form_dataset(google_form_path):
     """
-    Load the Google Form dataset
-    Expected format: CSV with pose keypoints and labels
+    Load the Google Form dataset and select only numeric features.
     """
     try:
         df = pd.read_csv(google_form_path)
-        # Assuming the last column is the label
-        X = df.iloc[:, :-1].values
-        y = df.iloc[:, -1].values
-        return X, y
+        # Assuming the first two columns are Timestamp and Email, and the last is the label.
+        # We will drop the first two columns, and use the rest for features, except the last one.
+        X = df.iloc[:, 2:-1].apply(pd.to_numeric, errors='coerce')
+        X = X.dropna(axis=1, how='all')
+        X = X.fillna(0)
+        
+        y = df.iloc[:, -1]
+        
+        return X.values, y.values
     except Exception as e:
-        print(f"Error loading Google Form dataset: {e}")
+        print(f"Error loading or processing Google Form dataset: {e}")
         return None, None
 
 def combine_datasets(X1, y1, X2, y2):
@@ -90,18 +94,46 @@ def create_model(input_shape):
 
 def main():
     # Paths to your datasets
-    mediapipe_path = "path/to/your/mediapipe_dataset.csv"
-    google_form_path = "path/to/your/google_form_dataset.csv"
+    mediapipe_path = "mediapipe_dataset.csv"
+    google_form_path = "google_form_dataset.csv"
     model_path = "../models/best_pose_model.h5"
     
     # Load datasets
     print("Loading datasets...")
     X_mediapipe, y_mediapipe = load_mediapipe_dataset(mediapipe_path)
     X_google, y_google = load_google_form_dataset(google_form_path)
-    
+
+    if X_mediapipe is not None:
+        print("Successfully loaded MediaPipe dataset.")
+    if X_google is not None:
+        print("Successfully loaded Google Form dataset.")
+
     # Combine datasets
     print("Combining datasets...")
-    X_combined, y_combined = combine_datasets(X_mediapipe, y_mediapipe, X_google, y_google)
+    if X_mediapipe is not None and X_google is not None:
+        # Check for compatible shapes before combining
+        if X_mediapipe.shape[1] != X_google.shape[1]:
+            print("Error: Datasets have different number of features and cannot be combined.")
+            # Decide on a strategy: maybe use only one, or attempt to align features
+            # For now, we'll prioritize the larger dataset
+            if X_google.shape[0] > X_mediapipe.shape[0]:
+                 print("Proceeding with only Google Form dataset due to feature mismatch.")
+                 X_combined, y_combined = X_google, y_google
+            else:
+                print("Proceeding with only MediaPipe dataset due to feature mismatch.")
+                X_combined, y_combined = X_mediapipe, y_mediapipe
+        else:
+            X_combined, y_combined = combine_datasets(X_mediapipe, y_mediapipe, X_google, y_google)
+            print("Successfully combined MediaPipe and Google Form datasets.")
+    elif X_google is not None:
+        X_combined, y_combined = X_google, y_google
+        print("Proceeding with only Google Form dataset.")
+    elif X_mediapipe is not None:
+        X_combined, y_combined = X_mediapipe, y_mediapipe
+        print("Proceeding with only MediaPipe dataset.")
+    else:
+        print("No datasets were loaded. Exiting.")
+        return
     
     if X_combined is None:
         print("Failed to combine datasets. Please check your data files.")

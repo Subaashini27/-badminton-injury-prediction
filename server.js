@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const { initializeDatabase } = require('./database');
+const { initializeDatabase, pool } = require('./database');
 const authRoutes = require('./routes/auth');
 const coachRoutes = require('./routes/coaches');
 const athleteRoutes = require('./routes/athletes');
@@ -19,19 +19,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Database connection
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'badminton_injury',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-};
-
-// Create connection pool
-const pool = mysql.createPool(dbConfig);
+// The database pool is now imported from 'database.js'
+// and the local dbConfig and pool are removed to avoid inconsistency.
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';

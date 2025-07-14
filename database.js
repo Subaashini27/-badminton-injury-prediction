@@ -12,9 +12,8 @@ const dbConfig = {
   connectionLimit: 10,
   queueLimit: 0,
   connectTimeout: 60000, // 60 seconds
-  ssl: process.env.DB_HOST && process.env.DB_HOST.includes('railway') ? {
-    rejectUnauthorized: false
-  } : false
+  // Always use SSL for cloud DBs (Railway, etc)
+  ssl: { rejectUnauthorized: false }
 };
 
 console.log('Database config:', {
@@ -228,12 +227,10 @@ async function createDefaultAdmin(connection) {
       // Create default admin user
       const bcrypt = require('bcryptjs');
       const hashedPassword = await bcrypt.hash('admin123', 10);
-      
       await connection.execute(
         'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
         ['System Administrator', 'admin@badmintonsafe.com', hashedPassword, 'admin']
       );
-      
       console.log('✅ Default admin user created successfully!');
       console.log('📧 Email: admin@badmintonsafe.com');
       console.log('🔑 Password: admin123');
