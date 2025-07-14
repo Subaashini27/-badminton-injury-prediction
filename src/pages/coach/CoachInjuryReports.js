@@ -70,7 +70,6 @@ const CoachInjuryReports = () => {
   const { currentUser } = useAuth();
   const [injuryReports, setInjuryReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [useFallbackData, setUseFallbackData] = useState(false);

@@ -5,7 +5,6 @@ import JointAnglesTable from '../../components/live-analysis/JointAnglesTable';
 import MediaPipeLiveAnalysis from '../../components/live-analysis/MediaPipeLiveAnalysis';
 import InjurySummary from '../../components/common/InjurySummary';
 import ExerciseRecommendations from '../../components/common/ExerciseRecommendations';
-import RiskNotificationBell from '../../components/common/RiskNotificationBell';
 import CoachFeedback from '../../components/athlete/CoachFeedback';
 import feedbackService from '../../services/feedbackService';
 import { useAuth } from '../../context/AuthContext';
@@ -37,7 +36,6 @@ ChartJS.register(
 
 const Dashboard = () => {
   const [analysisMode, setAnalysisMode] = useState('stopped');
-  const [riskData, setRiskData] = useState({ overall: 'low', areas: [] });
   const [jointAngles, setJointAngles] = useState(null);
   const [poseDataHistory, setPoseDataHistory] = useState({
     shoulder: [],
@@ -50,10 +48,6 @@ const Dashboard = () => {
   const [feedbackLoading, setFeedbackLoading] = useState(true);
   const [feedbackError, setFeedbackError] = useState(null);
   
-  // New state for saving analysis
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
-
   const { currentUser } = useAuth();
   const sessionAnglesHistory = useRef([]);
 
@@ -109,10 +103,8 @@ const Dashboard = () => {
   }, [isRealTimeTracking, updatePoseHistory]);
 
   const handleRiskAnalysis = useCallback((risk) => {
-    if (isRealTimeTracking) {
-      setRiskData(risk);
-    }
-  }, [isRealTimeTracking]);
+    // This function is no longer used as riskData state was removed
+  }, []);
 
   // Calculate overall score from a set of metrics
   const calculateOverallScore = (metrics) => {
@@ -147,9 +139,6 @@ const Dashboard = () => {
         sessionAnglesHistory.current = [];
         return;
       }
-
-      setIsSaving(true);
-      setSaveError(null);
 
       // Calculate average metrics from the session
       const metricSums = { shoulderRotation: 0, elbowBend: 0, hipRotation: 0, kneeAngle: 0 };
@@ -187,9 +176,8 @@ const Dashboard = () => {
           ...finalMetrics,
         });
       } catch (error) {
-        setSaveError('Failed to save session. Please try again.');
+        // setSaveError('Failed to save session. Please try again.'); // Removed as per edit hint
       } finally {
-        setIsSaving(false);
         sessionAnglesHistory.current = []; // Clear history after saving
       }
     };

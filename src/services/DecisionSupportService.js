@@ -598,4 +598,6 @@ class DecisionSupportService {
   }
 }
 
-export default new DecisionSupportService(); 
+// Assign instance to a variable before exporting as module default
+const decisionSupportService = new DecisionSupportService();
+export default decisionSupportService; 

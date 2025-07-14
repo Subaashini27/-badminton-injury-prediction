@@ -95,7 +95,6 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (profileData) => {
     try {
       // In a real app, you would make an API call here, e.g., to a '/users/profile' endpoint
-      console.log("Updating profile with:", profileData);
       const updatedUser = { 
         ...currentUser, 
         ...profileData 
@@ -104,7 +103,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(updatedUser));
       return updatedUser;
     } catch (error) {
-      console.error("Error updating profile:", error);
       throw new Error("Failed to update profile");
     }
   };

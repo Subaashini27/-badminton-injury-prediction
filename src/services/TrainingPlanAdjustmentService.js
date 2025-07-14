@@ -461,4 +461,6 @@ class TrainingPlanAdjustmentService {
   }
 }
 
-export default new TrainingPlanAdjustmentService(); 
+// Assign instance to a variable before exporting as module default
+const trainingPlanAdjustmentService = new TrainingPlanAdjustmentService();
+export default trainingPlanAdjustmentService; 

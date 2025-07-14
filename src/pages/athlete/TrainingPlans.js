@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useAnalysis } from '../../context/AnalysisContext';
 
 const TrainingPlans = () => {
-  const { user } = useAuth();
   const { analysisResults } = useAnalysis();
   const [trainingPlans, setTrainingPlans] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
@@ -14,7 +13,7 @@ const TrainingPlans = () => {
   useEffect(() => {
     loadTrainingPlans();
     loadCompletedSessions();
-  }, []);
+  }, [analysisResults]);
 
   const loadTrainingPlans = () => {
     // Load from localStorage or generate based on user profile

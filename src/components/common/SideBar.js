@@ -22,7 +22,7 @@ const SideBar = ({ isSidebarOpen, setSidebarOpen }) => {
       await logout();
       navigate('/login');
     } catch (error) {
-      console.error('Failed to logout:', error);
+      // console.error('Failed to logout:', error);
     }
   };
 

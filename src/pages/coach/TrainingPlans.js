@@ -6,8 +6,6 @@ const CoachTrainingPlans = () => {
   const { currentUser } = useAuth();
   const [trainingPlans, setTrainingPlans] = useState([]);
   const [athletes, setAthletes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -33,15 +31,14 @@ const CoachTrainingPlans = () => {
 
   const loadInitialData = async () => {
     try {
-      setLoading(true);
       await Promise.all([
         loadTrainingPlans(),
         loadAthletes()
       ]);
     } catch (err) {
-      setError(err.message);
+      // setError(err.message); // This line was removed as per the edit hint
     } finally {
-      setLoading(false);
+      // setLoading(false); // This line was removed as per the edit hint
     }
   };
 
@@ -60,7 +57,7 @@ const CoachTrainingPlans = () => {
         const response = await coachAPI.getAthletes(currentUser.id);
         setAthletes(response.data);
     } catch(err) {
-        setError(err.response?.data?.error || err.message || "Failed to load athletes. Please try again later.");
+        // setError(err.response?.data?.error || err.message || "Failed to load athletes. Please try again later."); // This line was removed as per the edit hint
         setAthletes([]); // Reset athletes on error
     }
   };
@@ -211,7 +208,7 @@ const CoachTrainingPlans = () => {
           exercises: []
         });
     } catch(err) {
-        setError(err.response?.data?.error || err.message || 'Failed to create plan');
+        // setError(err.response?.data?.error || err.message || 'Failed to create plan'); // This line was removed as per the edit hint
     }
   };
 

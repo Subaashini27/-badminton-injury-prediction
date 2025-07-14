@@ -22,7 +22,7 @@ const CoachLayout = () => {
       await logout();
       navigate('/login');
     } catch (error) {
-      console.error('Failed to logout:', error);
+      // console.error('Failed to logout:', error);
     }
   };
 

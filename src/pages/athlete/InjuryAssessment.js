@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalysis } from '../../context/AnalysisContext';
 
@@ -19,7 +19,7 @@ import { useAnalysis } from '../../context/AnalysisContext';
  */
 const InjuryAssessment = () => {
   const { currentUser } = useAuth();
-  const { metrics, metricsHistory, calculateOverallScore, latestAssessment, updateAssessment } = useAnalysis();
+  const { metrics, metricsHistory, updateAssessment } = useAnalysis();
   
   // Enhanced state management for professional assessment
   const [currentCategory, setCurrentCategory] = useState(0);
@@ -515,6 +515,19 @@ const InjuryAssessment = () => {
                 'Implement periodization',
                 'Add additional rest days',
                 'Monitor heart rate variability'
+              ]
+            });
+            break;
+          default:
+            recommendations.push({
+              category: 'General',
+              priority: 'Medium',
+              title: 'Risk Factor Detected',
+              description: `${categoryData.name} indicates elevated injury risk.`,
+              actions: [
+                'Monitor symptoms closely',
+                'Consult with medical professional',
+                'Adjust training intensity'
               ]
             });
             break;

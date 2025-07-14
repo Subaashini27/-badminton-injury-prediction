@@ -1,5 +1,4 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 class ReportGenerationService {
   constructor() {
@@ -331,4 +330,5 @@ class ReportGenerationService {
   }
 }
 
-export default new ReportGenerationService(); 
+const reportGenerationService = new ReportGenerationService();
+export default reportGenerationService; 

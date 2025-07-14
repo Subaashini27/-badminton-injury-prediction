@@ -1,8 +1,6 @@
 // src/pages/dashboards/CoachDashboard.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { coachAPI } from '../../services/api';
 import ReportGenerationService from '../../services/ReportGenerationService';
 import TrainingPlanAdjustmentService from '../../services/TrainingPlanAdjustmentService';
 import DecisionSupportService from '../../services/DecisionSupportService';
@@ -19,10 +17,8 @@ const CoachDashboard = () => {
     recentAnalyses: [],
     pendingAlerts: []
   });
-  const [timeRange, setTimeRange] = useState('week');
   const [notifications, setNotifications] = useState([]);
   const [aiInsights, setAiInsights] = useState([]);
-  const [automatedReports, setAutomatedReports] = useState([]);
   const [trainingAdjustments, setTrainingAdjustments] = useState([]);
   const [decisionSupport, setDecisionSupport] = useState(null);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -38,7 +34,7 @@ const CoachDashboard = () => {
     if (currentUser?.id) {
     fetchTeamData();
     }
-  }, [timeRange, currentUser]);
+  }, [currentUser]);
 
   useEffect(() => {
     // Update notifications based on team data
@@ -277,13 +273,13 @@ const CoachDashboard = () => {
 
       const filename = await ReportGenerationService.exportToPDF(reportType, reportData);
       
-      setAutomatedReports(prev => [...prev, {
-        id: Date.now(),
-        type: reportType,
-        filename,
-        generatedAt: new Date().toISOString(),
-        status: 'completed'
-      }]);
+      // setAutomatedReports(prev => [...prev, {
+      //   id: Date.now(),
+      //   type: reportType,
+      //   filename,
+      //   generatedAt: new Date().toISOString(),
+      //   status: 'completed'
+      // }]);
 
       // Add notification
       setNotifications(prev => [...prev, {
@@ -369,23 +365,6 @@ const CoachDashboard = () => {
     }
   ];
 
-  const performanceTrends = {
-    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-    datasets: [
-      {
-        label: 'Team Performance',
-        data: [75, 78, 82, 85],
-        borderColor: 'rgb(59, 130, 246)',
-        tension: 0.1
-      },
-      {
-        label: 'Injury Risk',
-        data: [30, 28, 25, 22],
-        borderColor: 'rgb(239, 68, 68)',
-        tension: 0.1
-      }
-    ]
-  };
   
   return (
     <div className="p-4">

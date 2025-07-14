@@ -194,20 +194,6 @@ const InjuryReports = () => {
     return recommendations;
   };
 
-  // Auto-suggest injury report based on high-risk analysis
-  const shouldSuggestInjuryReport = () => {
-    if (!metrics || !riskLevel) return false;
-    
-    const highRiskMetrics = [
-      metrics.shoulderRotation > 130,
-      metrics.elbowBend > 160,
-      metrics.kneeAngle > 150,
-      metrics.hipRotation > 135
-    ].filter(Boolean).length;
-
-    return riskLevel === 'high' && highRiskMetrics >= 2;
-  };
-
   // Show injury risk alert when patterns are detected
   useEffect(() => {
     // This could be integrated with a proper notification system in the future

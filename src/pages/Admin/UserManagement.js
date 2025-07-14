@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -28,7 +27,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [users, filters]);
+  }, [users, filters, applyFilters]);
 
   const loadUsers = () => {
     setIsLoading(true);

@@ -133,7 +133,7 @@ const CoachAthletes = () => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [loading, isRefreshing, useFallbackData]);
+  }, [loading, isRefreshing, useFallbackData, fetchAthletes]);
 
   const handleManualRefresh = () => {
     fetchAthletes(true);
