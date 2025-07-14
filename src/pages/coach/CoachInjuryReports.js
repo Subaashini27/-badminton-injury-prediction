@@ -100,7 +100,6 @@ const CoachInjuryReports = () => {
       setIsRefreshing(true);
       const response = await coachAPI.getInjuryReports(currentUser.id);
       setInjuryReports(response.data);
-      setError(null);
       setUseFallbackData(false);
       setLastRefresh(new Date());
     } catch (err) {
