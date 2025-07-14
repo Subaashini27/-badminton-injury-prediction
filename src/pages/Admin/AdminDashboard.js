@@ -100,7 +100,6 @@ const AdminDashboard = () => {
     // For example, refresh data when switching tabs
     if (tabName === 'logs') {
       // Trigger logs refresh
-      console.log('Switching to logs tab');
     }
   };
 

@@ -90,8 +90,8 @@ const Profile = () => {
     if (!formData.emergencyContact.phone.trim()) {
       newErrors['emergencyContact.phone'] = 'Emergency contact phone is required';
     }
-    // Less strict phone regex that accepts various formats
-    const phoneRegex = /^[0-9\-\+\(\)\s\.]{7,20}$/;
+    // Fix unnecessary escape characters in phoneRegex
+    const phoneRegex = /^[0-9\-+()\s.]{7,20}$/;
     if (formData.emergencyContact.phone && !phoneRegex.test(formData.emergencyContact.phone)) {
       newErrors['emergencyContact.phone'] = 'Invalid phone number format';
     }
@@ -146,7 +146,6 @@ const Profile = () => {
       success('Profile photo updated successfully');
     } catch (err) {
       error('Failed to upload profile photo');
-      console.error('Photo upload error:', err);
     } finally {
       setIsUploading(false);
     }
@@ -167,7 +166,6 @@ const Profile = () => {
       success('Profile updated successfully');
       setIsEditing(false);
     } catch (err) {
-      console.error('Profile update error:', err);
       setFormError(err.message || 'Failed to update profile');
       error('Failed to update profile');
     } finally {

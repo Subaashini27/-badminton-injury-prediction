@@ -20,9 +20,9 @@ export const AlertProvider = ({ children }) => {
   const [alerts, setAlerts] = useState([]);
   
   // Simple methods
-  const success = (message) => console.log("Success:", message);
-  const error = (message) => console.log("Error:", message);
-  const dismissAlert = (id) => console.log("Dismissed:", id);
+  const success = (message) => {};
+  const error = (message) => {};
+  const dismissAlert = (id) => {};
   
   const value = {
     alerts,

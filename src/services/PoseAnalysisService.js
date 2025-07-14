@@ -42,9 +42,9 @@ function checkBrowserCompatibility() {
 // Check compatibility on load
 const compatibilityIssues = checkBrowserCompatibility();
 if (compatibilityIssues.length > 0) {
-  console.warn('Browser compatibility issues detected:', compatibilityIssues);
+  // console.warn('Browser compatibility issues detected:', compatibilityIssues);
 } else {
-  console.log('Browser compatibility check passed');
+  // console.log('Browser compatibility check passed');
 }
 
 // Utility class for pose analysis

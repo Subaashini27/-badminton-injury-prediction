@@ -5,7 +5,7 @@ const getFeedback = async () => {
     const response = await api.get('/feedback');
     return response.data;
   } catch (error) {
-    console.error('Error fetching feedback:', error);
+    // Remove console.error for production
     throw error;
   }
 };
@@ -15,7 +15,7 @@ const sendFeedback = async (feedbackData) => {
     const response = await api.post('/feedback', feedbackData);
     return response.data;
   } catch (error) {
-    console.error('Error sending feedback:', error);
+    // Remove console.error for production
     throw error;
   }
 };

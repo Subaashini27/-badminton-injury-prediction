@@ -30,37 +30,27 @@ export const usePoseDetection = ({
         setIsLoading(true);
         setError(null);
         
-        console.log('About to initialize MediaPipe pose detection...');
-        
         // Check for availability of required APIs
         const hasGetUserMedia = !!(navigator.mediaDevices && 
                                   navigator.mediaDevices.getUserMedia);
-        console.log('getUserMedia available:', hasGetUserMedia);
         
         if (!hasGetUserMedia) {
           throw new Error('Camera API is not available in your browser');
         }
         
         // Initialize MediaPipe pose detection
-        console.log('Starting PoseAnalysisService initialization...');
         // Update with useFallbackMode preference
         await poseAnalysisService.initialize();
         poseAnalysisService.useFallbackMode = useFallbackMode;
-        console.log(`PoseAnalysisService initialized with useFallbackMode=${useFallbackMode}`);
         
         // Initialize video element
         if (videoRef.current) {
           videoRef.current.addEventListener('loadedmetadata', () => {
-            console.log('Video metadata loaded:', {
-              width: videoRef.current.videoWidth,
-              height: videoRef.current.videoHeight
-            });
           });
         }
         
         setIsLoading(false);
       } catch (err) {
-        console.error('Error initializing pose detection:', err);
         setError(`Failed to initialize pose detection: ${err.message}`);
         setIsLoading(false);
       }
@@ -70,7 +60,6 @@ export const usePoseDetection = ({
     
     // Cleanup function for component unmount
     return () => {
-      console.log('Cleaning up pose detection hook...');
       try {
         // Stop any ongoing analysis
         poseAnalysisService.stopAnalysis();
@@ -91,7 +80,6 @@ export const usePoseDetection = ({
         poseAnalysisService.cleanup();
         
       } catch (cleanupError) {
-        console.error('Error during hook cleanup:', cleanupError);
       }
     };
   }, [useFallbackMode]); // Include useFallbackMode and remove the other dependencies to prevent re-initialization loops
@@ -103,7 +91,6 @@ export const usePoseDetection = ({
     try {
       setIsLoading(true);
       setError(null);
-      console.log('Starting video upload process...');
 
       // Check file type
       if (!file.type.startsWith('video/')) {
@@ -115,7 +102,6 @@ export const usePoseDetection = ({
       
       // Ensure video element exists
       if (!videoRef.current) {
-        console.error('Video element not found in DOM');
         throw new Error('Video element not found');
       }
 
@@ -133,12 +119,6 @@ export const usePoseDetection = ({
       // Set new video source
       videoRef.current.src = videoUrl;
       
-      console.log('Loading video:', {
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type
-      });
-      
       // Wait for video metadata to load with timeout
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
@@ -148,17 +128,11 @@ export const usePoseDetection = ({
 
         const onLoadedMetadata = () => {
           clearTimeout(timeout);
-          console.log('Video metadata loaded:', {
-            width: videoRef.current.videoWidth,
-            height: videoRef.current.videoHeight,
-            duration: videoRef.current.duration
-          });
           resolve();
         };
 
         const onError = (error) => {
           clearTimeout(timeout);
-          console.error('Video loading error:', error);
           cleanup();
           reject(new Error('Failed to load video file'));
         };
@@ -189,11 +163,6 @@ export const usePoseDetection = ({
       canvasRef.current.width = videoWidth;
       canvasRef.current.height = videoHeight;
 
-      console.log('Canvas dimensions set:', {
-        width: canvasRef.current.width,
-        height: canvasRef.current.height
-      });
-
       // Start analysis with improved error handling
       try {
         await poseAnalysisService.startSession();
@@ -201,7 +170,6 @@ export const usePoseDetection = ({
         setIsAnalyzing(true);
 
         // Start video analysis with enhanced callback
-        console.log(`Starting video analysis with${useFallbackMode ? '' : 'out'} fallback mode`);
         // Set fallback mode before calling the method
         poseAnalysisService.useFallbackMode = useFallbackMode;
         await poseAnalysisService.startVideoAnalysis(
@@ -210,7 +178,6 @@ export const usePoseDetection = ({
           (results) => {
             try {
               if (results?.metrics) {
-                console.log('Received analysis results:', results);
                 const newMetrics = results.metrics;
                 setMetrics(newMetrics);
                 updateRiskLevel(newMetrics);
@@ -239,7 +206,6 @@ export const usePoseDetection = ({
                 });
               }
             } catch (callbackError) {
-              console.error('Error in analysis callback:', callbackError);
             }
           }
         );
@@ -255,15 +221,11 @@ export const usePoseDetection = ({
           });
         }
 
-        console.log('Video analysis started successfully');
-        
       } catch (analysisError) {
-        console.error('Error starting video analysis:', analysisError);
         throw new Error(`Failed to start video analysis: ${analysisError.message}`);
       }
 
     } catch (error) {
-      console.error('Error handling video upload:', error);
       setError(`Failed to load video: ${error.message}`);
       setIsVideoLoaded(false);
       setIsAnalyzing(false);
@@ -286,7 +248,6 @@ export const usePoseDetection = ({
     try {
       setIsLoading(true);
       setError(null);
-      console.log('Starting camera...');
 
       // Stop any existing stream first
       if (streamRef.current) {
@@ -300,7 +261,6 @@ export const usePoseDetection = ({
       }
 
       // Request camera access with optimized constraints
-      console.log('Requesting camera access...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640, max: 1280 }, // Lower resolution to reduce memory usage
@@ -310,8 +270,6 @@ export const usePoseDetection = ({
         }
       });
 
-      console.log('Camera access granted');
-      
       // Store stream reference for cleanup
       streamRef.current = stream;
 
@@ -333,16 +291,11 @@ export const usePoseDetection = ({
 
         const onPlaying = () => {
           clearTimeout(timeout);
-          console.log('Camera stream started:', {
-            width: videoRef.current.videoWidth,
-            height: videoRef.current.videoHeight
-          });
           resolve();
         };
 
         const onError = (error) => {
           clearTimeout(timeout);
-          console.error('Camera stream error:', error);
           cleanup();
           reject(new Error('Failed to start camera stream'));
         };
@@ -375,11 +328,6 @@ export const usePoseDetection = ({
       canvasRef.current.width = videoWidth;
       canvasRef.current.height = videoHeight;
 
-      console.log('Canvas dimensions set:', {
-        width: canvasRef.current.width,
-        height: canvasRef.current.height
-      });
-
       // Start analysis session with improved error handling
       try {
         await poseAnalysisService.startSession();
@@ -387,7 +335,6 @@ export const usePoseDetection = ({
         setIsAnalyzing(true);
 
         // Start camera analysis with enhanced callback
-        console.log(`Starting camera with${useFallbackMode ? '' : 'out'} fallback mode`);
         // Set fallback mode before calling the method
         poseAnalysisService.useFallbackMode = useFallbackMode;
         await poseAnalysisService.startCamera(
@@ -425,20 +372,15 @@ export const usePoseDetection = ({
                 });
               }
             } catch (callbackError) {
-              console.error('Error in camera analysis callback:', callbackError);
             }
           }
         );
 
-        console.log('Camera analysis started successfully');
-        
       } catch (analysisError) {
-        console.error('Error starting camera analysis:', analysisError);
         throw new Error(`Failed to start camera analysis: ${analysisError.message}`);
       }
 
     } catch (error) {
-      console.error('Error starting camera:', error);
       setError(`Failed to start camera: ${error.message}`);
       setIsAnalyzing(false);
       stopAnalysisContext();
@@ -458,7 +400,6 @@ export const usePoseDetection = ({
 
   const stopCamera = () => {
     try {
-      console.log('Stopping camera...');
       
       // Stop MediaPipe analysis
       poseAnalysisService.stopAnalysis();
@@ -467,7 +408,6 @@ export const usePoseDetection = ({
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('Camera track stopped:', track.kind);
         });
         streamRef.current = null;
       }
@@ -495,9 +435,7 @@ export const usePoseDetection = ({
       setMetrics(null);
       setError(null);
       
-      console.log('Camera stopped successfully');
     } catch (error) {
-      console.error('Error stopping camera:', error);
       setError('Failed to stop camera properly');
     }
   };

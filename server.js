@@ -60,7 +60,6 @@ app.get('/api/test-db', async (req, res) => {
     const [rows] = await pool.query('SELECT 1');
     res.send('✅ Database connected successfully!');
   } catch (err) {
-    console.error('❌ DB Query Error:', err);
     res.status(500).send('Database not connected');
   }
 });
@@ -68,11 +67,10 @@ app.get('/api/test-db', async (req, res) => {
 // Initialize database and start server
 initializeDatabase().then(() => {
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    app.listen(PORT, () => {
     console.log(`Health check: http://localhost:${PORT}/api/health`);
     console.log(`API Base URL: http://localhost:${PORT}/api`);
   });
 }).catch(error => {
-  console.error('Failed to initialize database:', error);
   process.exit(1);
 }); 

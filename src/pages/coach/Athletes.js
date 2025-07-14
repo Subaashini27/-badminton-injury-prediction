@@ -75,6 +75,16 @@ const CoachAthletes = () => {
   // Modal states
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedAthlete, setSelectedAthlete] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    experience: '',
+    level: 'beginner'
+  });
+  const [addError, setAddError] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
 
   const fetchAthletes = async (isManualRefresh = false) => {
     if (!currentUser?.id) {
@@ -159,6 +169,27 @@ const CoachAthletes = () => {
   const closeModal = () => {
     setShowProfileModal(false);
     setSelectedAthlete(null);
+  };
+
+  const handleAddAthleteSubmit = async (e) => {
+    e.preventDefault();
+    setAddError('');
+    setAddLoading(true);
+    try {
+      await coachAPI.addAthlete(currentUser.id, addForm);
+      setShowAddModal(false);
+      setAddForm({ name: '', email: '', password: '', experience: '', level: 'beginner' });
+      fetchAthletes(true); // Refresh with real data
+    } catch (err) {
+      setAddError(err.response?.data?.error || 'Failed to add athlete.');
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
+  const handleAddAthleteChange = (e) => {
+    const { name, value } = e.target;
+    setAddForm((prev) => ({ ...prev, [name]: value }));
   };
 
   // Profile Modal Component
@@ -282,6 +313,94 @@ const CoachAthletes = () => {
     );
   };
 
+  const AddAthleteModal = () => {
+    if (!showAddModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <form
+          className="bg-white rounded-lg p-6 w-full max-w-md"
+          onSubmit={handleAddAthleteSubmit}
+        >
+          <h2 className="text-xl font-bold mb-4">Add New Athlete</h2>
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">Name</label>
+            <input
+              name="name"
+              value={addForm.name}
+              onChange={handleAddAthleteChange}
+              required
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <input
+              name="email"
+              type="email"
+              value={addForm.email}
+              onChange={handleAddAthleteChange}
+              required
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">Password</label>
+            <input
+              name="password"
+              type="password"
+              value={addForm.password}
+              onChange={handleAddAthleteChange}
+              required
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-sm font-medium mb-1">Experience</label>
+            <input
+              name="experience"
+              value={addForm.experience}
+              onChange={handleAddAthleteChange}
+              className="w-full border rounded px-3 py-2"
+              placeholder="e.g. 3 years"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Level</label>
+            <select
+              name="level"
+              value={addForm.level}
+              onChange={handleAddAthleteChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          {addError && <div className="text-red-600 mb-2">{addError}</div>}
+          <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={() => setShowAddModal(false)}
+              className="px-4 py-2 bg-gray-200 rounded"
+              disabled={addLoading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+              disabled={addLoading}
+            >
+              {addLoading ? 'Adding...' : 'Add Athlete'}
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="p-6">
@@ -315,12 +434,12 @@ const CoachAthletes = () => {
           >
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </button>
-          <Link
-            to="/coach/add-athlete"
+          <button
+            onClick={() => setShowAddModal(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700"
           >
             Add Athlete
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -380,6 +499,7 @@ const CoachAthletes = () => {
         </div>
       )}
       <ProfileModal />
+      <AddAthleteModal />
     </div>
   );
 };

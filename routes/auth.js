@@ -14,8 +14,6 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role = 'athlete' } = req.body;
     
-    console.log('Registration attempt for:', email);
-    
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required' });
@@ -36,52 +34,33 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    console.log('Getting database connection...');
     connection = await pool.getConnection();
-    console.log('Database connection successful');
-    
-    // Test connection
-    await connection.execute('SELECT 1');
-    console.log('Database query test successful');
     
     // Create user
-    console.log('Inserting user into database...');
     const [userResult] = await connection.execute(
       'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
       [name, email, hashedPassword, role]
     );
     
     const userId = userResult.insertId;
-    console.log('User created with ID:', userId);
     
     // If registering as athlete, create athlete record
     if (role === 'athlete') {
-      console.log('Creating athlete record...');
       await connection.execute(
         'INSERT INTO athletes (user_id) VALUES (?)',
         [userId]
       );
-      console.log('Athlete record created');
     }
     
     // Generate JWT token
     const token = jwt.sign({ id: userId, email, role }, JWT_SECRET, { expiresIn: '24h' });
     
-    console.log('Registration successful for user:', userId);
     res.status(201).json({
       message: 'User registered successfully',
       token,
       user: { id: userId, name, email, role }
     });
   } catch (error) {
-    console.error('Registration error details:', {
-      message: error.message,
-      code: error.code,
-      errno: error.errno,
-      sqlState: error.sqlState,
-      stack: error.stack
-    });
-    
     if (error.code === 'ER_DUP_ENTRY') {
       res.status(400).json({ error: 'Email already exists' });
     } else if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
@@ -92,7 +71,6 @@ router.post('/register', async (req, res) => {
   } finally {
     if (connection) {
       connection.release();
-      console.log('Database connection released');
     }
   }
 });
@@ -168,8 +146,6 @@ router.post('/create-admin', requireAdmin, async (req, res) => {
   try {
     const { name, email, password } = req.body;
     
-    console.log('Admin creation attempt by:', req.user.email, 'for:', email);
-    
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required' });
@@ -190,7 +166,6 @@ router.post('/create-admin', requireAdmin, async (req, res) => {
     
     connection.release();
     
-    console.log('Admin user created successfully by:', req.user.email, 'for:', email);
     res.status(201).json({
       message: 'Admin user created successfully',
       user: { id: userId, name, email, role: 'admin' }

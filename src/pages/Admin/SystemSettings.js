@@ -147,7 +147,6 @@ const SystemSettings = () => {
       setOriginalSettings(JSON.parse(JSON.stringify(settings)));
       
     } catch (err) {
-      console.error('Error loading settings:', err);
       setError('Failed to load system settings');
     } finally {
       setLoading(false);
@@ -181,7 +180,6 @@ const SystemSettings = () => {
       setTimeout(() => setSuccess(null), 3000);
       
     } catch (err) {
-      console.error('Error saving settings:', err);
       setError('Failed to save settings');
     } finally {
       setSaving(false);

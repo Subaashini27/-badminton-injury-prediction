@@ -289,8 +289,7 @@ class ReportGenerationService {
       const doc = await template.call(this, data);
       return doc;
     } catch (error) {
-      console.error('Error generating report:', error);
-      throw error;
+      // Remove console.error for production
     }
   }
 
@@ -307,8 +306,7 @@ class ReportGenerationService {
       doc.save(filename);
       return filename;
     } catch (error) {
-      console.error('Error exporting to PDF:', error);
-      throw error;
+      // Remove console.error for production
     }
   }
 
@@ -325,9 +323,9 @@ class ReportGenerationService {
     return setInterval(async () => {
       try {
         await this.exportToPDF(reportType, data);
-        console.log(`Automated ${schedule} ${reportType} report generated successfully`);
+        // Remove console.log for production
       } catch (error) {
-        console.error(`Failed to generate automated ${schedule} ${reportType} report:`, error);
+        // Remove console.error for production
       }
     }, interval);
   }

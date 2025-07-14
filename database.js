@@ -16,14 +16,6 @@ const dbConfig = {
   ssl: { rejectUnauthorized: false }
 };
 
-console.log('Database config:', {
-  host: dbConfig.host,
-  port: dbConfig.port,
-  user: dbConfig.user,
-  database: dbConfig.database,
-  ssl: dbConfig.ssl
-});
-
 // Create connection pool
 const pool = mysql.createPool(dbConfig);
 
@@ -201,15 +193,11 @@ async function initializeDatabase() {
       )
     `);
 
-    console.log('Base tables created or already exist.');
-
     // Create default admin user if it doesn't exist
     await createDefaultAdmin(connection);
 
     connection.release();
-    console.log('Database tables initialized successfully');
   } catch (error) {
-    console.error('Database initialization error:', error);
     throw error;
   }
 }
@@ -231,15 +219,8 @@ async function createDefaultAdmin(connection) {
         'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
         ['System Administrator', 'admin@badmintonsafe.com', hashedPassword, 'admin']
       );
-      console.log('✅ Default admin user created successfully!');
-      console.log('📧 Email: admin@badmintonsafe.com');
-      console.log('🔑 Password: admin123');
-      console.log('⚠️  IMPORTANT: Change these credentials after first login!');
-    } else {
-      console.log('ℹ️  Admin user already exists, skipping creation.');
     }
   } catch (error) {
-    console.error('Error creating default admin:', error);
     // Don't throw error here as it's not critical for system startup
   }
 }

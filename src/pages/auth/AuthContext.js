@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
           // Set initial redirect path based on role
           setRedirectPath(getRoleDashboard(user.role));
         } catch (error) {
-          console.error('Error parsing stored user:', error);
+          // Remove console.error for production
           localStorage.removeItem('user');
           localStorage.removeItem('token');
           sessionStorage.removeItem('user');
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true, user };
     } catch (error) {
-      console.error('Login error:', error);
+      // Remove console.error for production
       throw new Error(error.message || 'Login failed');
     }
   };
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
       await simulateApiRegister(userData);
       return { success: true };
     } catch (error) {
-      console.error('Registration error:', error);
+      // Remove console.error for production
       throw new Error(error.message || 'Registration failed');
     }
   };
