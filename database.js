@@ -12,16 +12,11 @@ const dbConfig = {
   connectionLimit: 10,
   queueLimit: 0,
   connectTimeout: 60000, // 60 seconds
-  acquireTimeout: 60000,
-  timeout: 60000,
   // SSL configuration for cloud databases
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  // Additional Railway-specific configuration
+  // Additional configuration
   timezone: '+00:00',
-  charset: 'utf8mb4',
-  // Retry configuration
-  reconnect: true,
-  idleTimeout: 300000
+  charset: 'utf8mb4'
 };
 
 // Create connection pool
@@ -30,7 +25,9 @@ const pool = mysql.createPool(dbConfig);
 // Initialize database tables
 async function initializeDatabase() {
   try {
+    console.log('Attempting to connect to database...');
     const connection = await pool.getConnection();
+    console.log('Database connection successful!');
     
     // Create users table
     await connection.execute(`
@@ -205,7 +202,9 @@ async function initializeDatabase() {
     await createDefaultAdmin(connection);
 
     connection.release();
+    console.log('Database tables initialized successfully');
   } catch (error) {
+    console.error('Database initialization error:', error.message);
     throw error;
   }
 }
