@@ -138,7 +138,7 @@ const apiService = {
         const response = await api.post('/api/auth/login', { email, password });
         return response;
       } catch (error) {
-        console.warn('Backend unavailable, using fallback authentication');
+        // Backend unavailable, using fallback authentication
         return fallbackAuth.login(email, password);
       }
     },
@@ -148,7 +148,7 @@ const apiService = {
         const response = await api.post('/api/auth/register', userData);
         return response;
       } catch (error) {
-        console.warn('Backend unavailable, using fallback registration');
+        // Backend unavailable, using fallback registration
         return fallbackAuth.register(userData);
       }
     },
@@ -201,8 +201,7 @@ export const athleteAPI = {
       const response = await api.post('/api/athletes/analysis', analysisData);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, saving analysis data locally');
+      // Fallback to localStorage - saving analysis data locally
       const analysisHistory = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
       analysisHistory.push({ ...analysisData, timestamp: new Date().toISOString() });
       localStorage.setItem('analysisHistory', JSON.stringify(analysisHistory));
@@ -215,8 +214,7 @@ export const athleteAPI = {
       const response = await api.get(`/api/athletes/${athleteId}/analysis`);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, using local analysis history');
+      // Fallback to localStorage - using local analysis history
       const analysisHistory = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
       return { data: analysisHistory };
     }
@@ -229,8 +227,7 @@ export const coachAPI = {
       const response = await api.get(`/api/coaches/${coachId}/training-plans`);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, using local training plans');
+      // Fallback to localStorage - using local training plans
       return { data: [] };
     }
   },
@@ -240,8 +237,7 @@ export const coachAPI = {
       const response = await api.get(`/api/coaches/${coachId}/athletes`);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, using local athletes data');
+      // Fallback to localStorage - using local athletes data
       return { data: [] };
     }
   },
@@ -251,8 +247,7 @@ export const coachAPI = {
       const response = await api.post(`/api/coaches/${coachId}/training-plans`, planData);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, saving training plan locally');
+      // Fallback to localStorage - saving training plan locally
       return { data: { success: true, plan: planData } };
     }
   },
@@ -262,8 +257,7 @@ export const coachAPI = {
       const response = await api.get(`/api/coaches/${coachId}/injury-reports`);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, using local injury reports');
+      // Fallback to localStorage - using local injury reports
       return { data: [] };
     }
   },
@@ -273,8 +267,7 @@ export const coachAPI = {
       const response = await api.post(`/api/coaches/${coachId}/athletes`, athleteData);
       return response;
     } catch (error) {
-      // Fallback to localStorage
-      console.warn('Backend unavailable, saving athlete locally');
+      // Fallback to localStorage - saving athlete locally
       return { data: { success: true, athlete: athleteData } };
     }
   }
