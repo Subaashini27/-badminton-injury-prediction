@@ -12,7 +12,7 @@ const AuthRedirect = () => {
     const handleRedirect = () => {
       // If we have a redirect path and we're authenticated
       if (redirectPath && isAuthenticated) {
-        console.log('Redirecting to:', redirectPath);
+        // Redirecting to specified path
         navigate(redirectPath);
         clearRedirectPath();
         return;
@@ -21,14 +21,14 @@ const AuthRedirect = () => {
       // If we're authenticated but on login/register page, redirect to appropriate dashboard
       if (isAuthenticated && ['/login', '/register', '/'].includes(location.pathname)) {
         const dashboardPath = currentUser?.role === 'athlete' ? '/athlete' : '/coach';
-        console.log('Redirecting to dashboard:', dashboardPath);
+        // Redirecting to dashboard
         navigate(dashboardPath);
         return;
       }
 
       // If we're not authenticated and not on login/register page, redirect to login
       if (!isAuthenticated && !['/login', '/register', '/'].includes(location.pathname)) {
-        console.log('Not authenticated, redirecting to login');
+        // Not authenticated, redirecting to login
         navigate('/login');
       }
     };

@@ -18,7 +18,7 @@ const Profile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // TODO: Implement profile update logic
-    console.log('Profile update:', formData);
+    // Profile update handled
   };
 
   const handleChange = (e) => {

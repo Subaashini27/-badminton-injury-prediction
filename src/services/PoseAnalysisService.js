@@ -199,7 +199,7 @@ class PoseAnalysisService {
       const devices = await navigator.mediaDevices.enumerateDevices();
       return devices.filter(device => device.kind === 'videoinput');
     } catch (error) {
-      console.error('Error getting available cameras:', error);
+              // Error getting available cameras
       return [];
     }
   }

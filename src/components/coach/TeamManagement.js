@@ -27,7 +27,7 @@ const TeamManagement = () => {
       const data = await response.json();
       setAthletes(data);
     } catch (error) {
-      console.error('Error fetching athletes:', error);
+      // Error fetching athletes
     }
   };
 
@@ -48,7 +48,7 @@ const TeamManagement = () => {
       setInviteEmail('');
       setShowInviteForm(false);
     } catch (error) {
-      console.error('Error sending invitation:', error);
+      // Error sending invitation
     }
   };
 
@@ -76,7 +76,7 @@ const TeamManagement = () => {
       setShowCreateForm(false);
       fetchAthletes();
     } catch (error) {
-      console.error('Error creating athlete:', error);
+      // Error creating athlete
     }
   };
 

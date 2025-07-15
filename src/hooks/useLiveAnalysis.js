@@ -149,7 +149,7 @@ export const useLiveAnalysis = () => {
       setShowPositioningGuide(true);
       setMetrics(INITIAL_METRICS);
     } catch (error) {
-      console.error('Error during cleanup:', error);
+              // Error during cleanup
     }
   }, []); // Remove stopAnalysisContext dependency to prevent circular dependencies
 

@@ -67,7 +67,7 @@ const AdminDashboard = () => {
       setDashboardStats(mockStats);
       setError(null);
     } catch (err) {
-      console.error('Error fetching dashboard stats:', err);
+      // Error fetching dashboard stats
       setError('Failed to load dashboard statistics');
     } finally {
       setLoading(false);
