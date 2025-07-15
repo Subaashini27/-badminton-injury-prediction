@@ -3,17 +3,25 @@ const mysql = require('mysql2/promise');
 
 // Database connection
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 43292, // Railway MySQL port
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Badminjury@123',
-  database: process.env.DB_NAME || 'badminton_injury',
+  host: process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost',
+  port: process.env.DB_PORT || process.env.MYSQL_PORT || 3306,
+  user: process.env.DB_USER || process.env.MYSQL_USER || 'root',
+  password: process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD,
+  database: process.env.DB_NAME || process.env.MYSQL_DATABASE || 'badminton_injury',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   connectTimeout: 60000, // 60 seconds
-  // Always use SSL for cloud DBs (Railway, etc)
-  ssl: { rejectUnauthorized: false }
+  acquireTimeout: 60000,
+  timeout: 60000,
+  // SSL configuration for cloud databases
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // Additional Railway-specific configuration
+  timezone: '+00:00',
+  charset: 'utf8mb4',
+  // Retry configuration
+  reconnect: true,
+  idleTimeout: 300000
 };
 
 // Create connection pool

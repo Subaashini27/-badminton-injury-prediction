@@ -9,36 +9,6 @@ const TrainingPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [completedSessions, setCompletedSessions] = useState({});
 
-  const loadTrainingPlans = useCallback(() => {
-    // Load from localStorage or generate based on user profile
-    const savedPlans = localStorage.getItem('trainingPlans');
-    if (savedPlans) {
-      const plans = JSON.parse(savedPlans);
-      setTrainingPlans(plans);
-      setCurrentPlan(plans.find(p => p.status === 'active') || plans[0]);
-    } else {
-      // Generate default plans based on risk analysis
-      const defaultPlans = generateDefaultPlans();
-      setTrainingPlans(defaultPlans);
-      setCurrentPlan(defaultPlans[0]);
-      localStorage.setItem('trainingPlans', JSON.stringify(defaultPlans));
-    }
-  }, [analysisResults, generateDefaultPlans]);
-
-  useEffect(() => {
-    loadTrainingPlans();
-    loadCompletedSessions();
-  }, [loadTrainingPlans]);
-
-
-
-  const loadCompletedSessions = () => {
-    const saved = localStorage.getItem('completedSessions');
-    if (saved) {
-      setCompletedSessions(JSON.parse(saved));
-    }
-  };
-
   const generateDefaultPlans = useCallback(() => {
     const riskLevel = analysisResults?.riskLevel || 'low';
     
@@ -135,6 +105,34 @@ const TrainingPlans = () => {
 
     return plans;
   }, [analysisResults]);
+
+  const loadTrainingPlans = useCallback(() => {
+    // Load from localStorage or generate based on user profile
+    const savedPlans = localStorage.getItem('trainingPlans');
+    if (savedPlans) {
+      const plans = JSON.parse(savedPlans);
+      setTrainingPlans(plans);
+      setCurrentPlan(plans.find(p => p.status === 'active') || plans[0]);
+    } else {
+      // Generate default plans based on risk analysis
+      const defaultPlans = generateDefaultPlans();
+      setTrainingPlans(defaultPlans);
+      setCurrentPlan(defaultPlans[0]);
+      localStorage.setItem('trainingPlans', JSON.stringify(defaultPlans));
+    }
+  }, [generateDefaultPlans]);
+
+  const loadCompletedSessions = () => {
+    const saved = localStorage.getItem('completedSessions');
+    if (saved) {
+      setCompletedSessions(JSON.parse(saved));
+    }
+  };
+
+  useEffect(() => {
+    loadTrainingPlans();
+    loadCompletedSessions();
+  }, [loadTrainingPlans]);
 
   const markExerciseComplete = (planId, exerciseId) => {
     const key = `${planId}-${exerciseId}`;

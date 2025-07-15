@@ -274,11 +274,11 @@ const Dashboard = () => {
     <div className="flex bg-gray-100">
       <main className="flex-1 overflow-y-auto">
         
-        <div className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-[2.5fr_1fr] gap-6">
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 xl:grid-cols-[2.5fr_1fr] gap-4 sm:gap-6">
             {/* Live Analysis Section */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold mb-4 text-gray-800">Live Analysis</h2>
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">Live Analysis</h2>
               <MediaPipeLiveAnalysis
                 mode={analysisMode}
                 onModeChange={setAnalysisMode}
@@ -290,22 +290,22 @@ const Dashboard = () => {
             </div>
 
             {/* Risk Heatmap Section */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold mb-4 text-gray-800">Risk Assessment</h2>
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">Risk Assessment</h2>
               <BodyHeatmapNew jointAngles={jointAngles} />
             </div>
           </div>
 
           {/* Joint Angles Table Section - Full Width Below */}
-          <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Joint Angles</h2>
+          <div className="mt-4 sm:mt-6 bg-white p-4 sm:p-6 rounded-lg shadow-md">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">Joint Angles</h2>
             <JointAnglesTable metrics={jointAngles} />
           </div>
 
           {/* Real-time chart section */}
-          <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold mb-4 text-gray-800">
+          <div className="mt-4 sm:mt-6 bg-white p-4 sm:p-6 rounded-lg shadow-md">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-4 sm:space-y-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 Performance Over Time
                 {analysisMode !== 'stopped' && (
                   <span className="ml-2 text-sm font-normal text-green-600">
@@ -313,7 +313,7 @@ const Dashboard = () => {
                   </span>
                 )}
               </h2>
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -330,19 +330,19 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <div style={{ height: '300px' }}>
+            <div className="h-64 sm:h-80">
               <Line data={chartData} options={chartOptions} />
             </div>
           </div>
 
           {/* Injury Summary and Exercise Recommendations */}
-          <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <InjurySummary jointAngles={jointAngles} />
             <ExerciseRecommendations jointAngles={jointAngles} />
           </div>
 
           {/* Coach Feedback Section */}
-          <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
+          <div className="mt-4 sm:mt-6 bg-white p-4 sm:p-6 rounded-lg shadow-md">
             <CoachFeedback 
               feedback={coachFeedback}
               isLoading={feedbackLoading}

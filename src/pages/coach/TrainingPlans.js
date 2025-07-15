@@ -23,40 +23,8 @@ const CoachTrainingPlans = () => {
     exercises: []
   });
 
-  const loadInitialData = useCallback(async () => {
-    if (currentUser?.id) {
-      await Promise.all([
-        loadTrainingPlans(),
-        loadAthletes()
-      ]);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
-
-  const loadTrainingPlans = async () => {
-    try {
-        const response = await coachAPI.getTrainingPlans(currentUser.id);
-        setTrainingPlans(response.data);
-    } catch(err) {
-        // If fetch fails (e.g., endpoint not ready), use default plans for now
-        setTrainingPlans(generateDefaultPlans());
-    }
-  };
-
-  const loadAthletes = async () => {
-    try {
-        const response = await coachAPI.getAthletes(currentUser.id);
-        setAthletes(response.data);
-    } catch(err) {
-        // setError(err.response?.data?.error || err.message || "Failed to load athletes. Please try again later."); // This line was removed as per the edit hint
-        setAthletes([]); // Reset athletes on error
-    }
-  };
-
-  const generateDefaultPlans = () => {
+  // Function definitions - moved before usage
+  const generateDefaultPlans = useCallback(() => {
     return [
       {
         id: 1,
@@ -101,87 +69,44 @@ const CoachTrainingPlans = () => {
             instructions: 'Hold plank position, maintain proper form'
           }
         ]
-      },
-      {
-        id: 2,
-        name: 'Advanced Performance Training',
-        description: 'High-intensity training for competitive players',
-        duration: '6 weeks',
-        level: 'advanced',
-        category: 'performance',
-        status: 'active',
-        createdBy: currentUser?.name || 'Coach',
-        createdDate: new Date().toISOString(),
-        assignedAthletes: [4],
-        exercises: [
-          {
-            id: 1,
-            name: 'Plyometric Training',
-            description: 'Explosive movement exercises',
-            duration: '20 minutes',
-            sets: 4,
-            reps: 8,
-            targetArea: 'Legs',
-            instructions: 'Jump squats, box jumps, lateral bounds'
-          },
-          {
-            id: 2,
-            name: 'Agility Ladder',
-            description: 'Footwork and coordination drills',
-            duration: '15 minutes',
-            sets: 5,
-            reps: 1,
-            targetArea: 'Legs',
-            instructions: 'Various ladder patterns, focus on speed and precision'
-          },
-          {
-            id: 3,
-            name: 'Sport-Specific Drills',
-            description: 'Badminton movement patterns',
-            duration: '25 minutes',
-            sets: 3,
-            reps: 10,
-            targetArea: 'Full Body',
-            instructions: 'Lunges, overhead clears, smash preparation'
-          }
-        ]
-      },
-      {
-        id: 3,
-        name: 'Injury Recovery Protocol',
-        description: 'Rehabilitation program for injured athletes',
-        duration: '8 weeks',
-        level: 'intermediate',
-        category: 'rehabilitation',
-        status: 'active',
-        createdBy: currentUser?.name || 'Coach',
-        createdDate: new Date().toISOString(),
-        assignedAthletes: [],
-        exercises: [
-          {
-            id: 1,
-            name: 'Gentle Mobilization',
-            description: 'Low-impact movement exercises',
-            duration: '15 minutes',
-            sets: 2,
-            reps: 15,
-            targetArea: 'Joints',
-            instructions: 'Slow, controlled movements within pain-free range'
-          },
-          {
-            id: 2,
-            name: 'Progressive Loading',
-            description: 'Gradual strength building',
-            duration: '20 minutes',
-            sets: 3,
-            reps: 8,
-            targetArea: 'Affected Area',
-            instructions: 'Start with light resistance, progress weekly'
-          }
-        ]
       }
     ];
-  };
+  }, [currentUser]);
+
+  const loadTrainingPlans = useCallback(async () => {
+    try {
+        const response = await coachAPI.getTrainingPlans(currentUser.id);
+        setTrainingPlans(response.data);
+    } catch(err) {
+        // If fetch fails (e.g., endpoint not ready), use default plans for now
+        setTrainingPlans(generateDefaultPlans());
+    }
+  }, [currentUser, generateDefaultPlans]);
+
+  const loadAthletes = useCallback(async () => {
+    try {
+        const response = await coachAPI.getAthletes(currentUser.id);
+        setAthletes(response.data);
+    } catch(err) {
+        // setError(err.response?.data?.error || err.message || "Failed to load athletes. Please try again later."); // This line was removed as per the edit hint
+        setAthletes([]); // Reset athletes on error
+    }
+  }, [currentUser]);
+
+  const loadInitialData = useCallback(async () => {
+    if (currentUser?.id) {
+      await Promise.all([
+        loadTrainingPlans(),
+        loadAthletes()
+      ]);
+    }
+  }, [currentUser, loadTrainingPlans, loadAthletes]);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
+
 
   const handleCreatePlan = async () => {
     if (!newPlan.name || !newPlan.description) {

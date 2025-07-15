@@ -12,6 +12,7 @@ import {
   Legend,
   TimeScale
 } from 'chart.js';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
 ChartJS.register(

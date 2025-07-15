@@ -42,9 +42,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function without navigation (navigation will be handled by components)
-  const login = async (username, password, rememberMe = false) => {
+  const login = async (emailOrUsername, password, rememberMe = false) => {
     try {
-      const { user, token } = await simulateApiLogin(username, password);
+      // Import the API service
+      const { default: apiService } = await import('../../services/api');
+      
+      const response = await apiService.auth.login(emailOrUsername, password);
+      const { user, token } = response.data;
       
       // Store auth data in appropriate storage
       const storage = rememberMe ? localStorage : sessionStorage;
@@ -58,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       const path = getRoleDashboard(user.role);
       setRedirectPath(path);
       
-      return { success: true, user };
+      return user;
     } catch (error) {
       // Remove console.error for production
       throw new Error(error.message || 'Login failed');
@@ -81,7 +85,10 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async (userData) => {
     try {
-      await simulateApiRegister(userData);
+      // Import the API service
+      const { default: apiService } = await import('../../services/api');
+      
+      await apiService.auth.register(userData);
       return { success: true };
     } catch (error) {
       // Remove console.error for production
@@ -134,97 +141,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Simulate API login (replace with your actual API call)
-const simulateApiLogin = async (username, password) => {
-  // This is just for demo - replace with your actual API logic
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Demo validation
-      if (username === 'demo_athlete' && password === 'password') {
-        resolve({
-          user: {
-            id: '1',
-            username: 'demo_athlete',
-            fullName: 'Demo Athlete',
-            email: 'athlete@example.com',
-            role: 'athlete'
-          },
-          token: 'mock-jwt-token-athlete'
-        });
-      } else if (username === 'demo_coach' && password === 'password') {
-        resolve({
-          user: {
-            id: '2',
-            username: 'demo_coach',
-            fullName: 'Demo Coach',
-            email: 'coach@example.com',
-            role: 'coach'
-          },
-          token: 'mock-jwt-token-coach'
-        });
-      } else {
-        // Replace this with checking your actual registered users
-        // For now we'll just use a mock database check
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const user = registeredUsers.find(u => u.username === username);
-        
-        if (user && user.password === password) {
-          // Never include password in the returned user object
-          const { password, ...userWithoutPassword } = user;
-          resolve({
-            user: userWithoutPassword,
-            token: `mock-jwt-token-${user.role}`
-          });
-        } else {
-          reject({ message: 'Invalid username or password' });
-        }
-      }
-    }, 800); // Simulate network delay
-  });
-};
-
-// Simulate API register (replace with your actual API call)
-const simulateApiRegister = async (userData) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // Get existing users or create empty array
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        
-        // Check if username or email already exists
-        const usernameExists = registeredUsers.some(user => user.username === userData.username);
-        const emailExists = registeredUsers.some(user => user.email === userData.email);
-        
-        if (usernameExists) {
-          reject({ message: 'Username already exists' });
-          return;
-        }
-        
-        if (emailExists) {
-          reject({ message: 'Email already exists' });
-          return;
-        }
-        
-        // Create new user
-        const newUser = {
-          id: Date.now().toString(),
-          fullName: userData.fullName,
-          email: userData.email,
-          username: userData.username,
-          password: userData.password, // In a real app, NEVER store plain text passwords
-          role: userData.role
-        };
-        
-        // Save to "database"
-        registeredUsers.push(newUser);
-        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        
-        resolve({ success: true });
-      } catch (error) {
-        reject({ message: 'Registration failed' });
-      }
-    }, 800); // Simulate network delay
-  });
-};
+// Note: Authentication now uses the API service with fallback to localStorage simulation
 
 export default AuthContext;

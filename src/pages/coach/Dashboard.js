@@ -23,55 +23,7 @@ const CoachDashboard = () => {
   const [decisionSupport, setDecisionSupport] = useState(null);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
-  useEffect(() => {
-    if (currentUser && currentUser.token) {
-      // Set the default authorization header for all API requests
-      // This is a common pattern, but make sure your API service is configured to use it
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    if (currentUser?.id) {
-    fetchTeamData();
-    }
-  }, [currentUser, fetchTeamData]);
-
-  useEffect(() => {
-    // Update notifications based on team data
-    const newNotifications = [];
-    
-    // Add high risk athlete notifications
-    teamData.athletes.forEach(athlete => {
-      if (athlete.riskLevel === 'high') {
-        newNotifications.push({
-          type: 'warning',
-          title: 'High Risk Athlete',
-          message: `${athlete.name} has a high risk of injury. Please review their recent analysis.`
-        });
-      }
-    });
-
-    // Add risk distribution notifications
-    if (teamData.riskDistribution.high > 0) {
-      newNotifications.push({
-        type: 'warning',
-        title: 'Team Risk Alert',
-        message: `${teamData.riskDistribution.high} athletes are at high risk of injury.`
-      });
-    }
-
-    setNotifications(newNotifications);
-  }, [teamData]);
-
-  useEffect(() => {
-    // Generate AI insights when team data changes
-    if (teamData.athletes.length > 0) {
-      generateAIInsights();
-      generateTrainingAdjustments();
-      generateDecisionSupport();
-    }
-  }, [teamData, generateAIInsights, generateTrainingAdjustments, generateDecisionSupport]);
-
+  // Function definitions - moved before usage
   const fetchTeamData = useCallback(async () => {
     if (!currentUser?.id) return;
 
@@ -135,7 +87,7 @@ const CoachDashboard = () => {
       ],
       riskDistribution: { high: 1, medium: 1, low: 1 },
       recentAnalyses: [],
-      pendingAlerts: [      ]
+      pendingAlerts: []
     });
   }, [currentUser]);
 
@@ -224,6 +176,57 @@ const CoachDashboard = () => {
     const teamDecisions = DecisionSupportService.generateTeamDecisions(teamData);
     setDecisionSupport(teamDecisions);
   }, [teamData]);
+
+  useEffect(() => {
+    if (currentUser && currentUser.token) {
+      // Set the default authorization header for all API requests
+      // This is a common pattern, but make sure your API service is configured to use it
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser?.id) {
+    fetchTeamData();
+    }
+  }, [currentUser, fetchTeamData]);
+
+  useEffect(() => {
+    // Update notifications based on team data
+    const newNotifications = [];
+    
+    // Add high risk athlete notifications
+    teamData.athletes.forEach(athlete => {
+      if (athlete.riskLevel === 'high') {
+        newNotifications.push({
+          type: 'warning',
+          title: 'High Risk Athlete',
+          message: `${athlete.name} has a high risk of injury. Please review their recent analysis.`
+        });
+      }
+    });
+
+    // Add risk distribution notifications
+    if (teamData.riskDistribution.high > 0) {
+      newNotifications.push({
+        type: 'warning',
+        title: 'Team Risk Alert',
+        message: `${teamData.riskDistribution.high} athletes are at high risk of injury.`
+      });
+    }
+
+    setNotifications(newNotifications);
+  }, [teamData]);
+
+  useEffect(() => {
+    // Generate AI insights when team data changes
+    if (teamData.athletes.length > 0) {
+      generateAIInsights();
+      generateTrainingAdjustments();
+      generateDecisionSupport();
+    }
+  }, [teamData, generateAIInsights, generateTrainingAdjustments, generateDecisionSupport]);
+
+
 
   // Generate automated reports
   const generateAutomatedReport = async (reportType) => {
@@ -367,15 +370,15 @@ const CoachDashboard = () => {
 
   
   return (
-    <div className="p-4">
+    <div className="p-4 sm:p-6">
       {/* Welcome Section - Reduced vertical spacing with mb-4 instead of mb-8 */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">Welcome, {currentUser?.name || 'Coach'}</h1>
-        <p className="text-gray-600">Manage your team and monitor their performance</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Welcome, {currentUser?.name || 'Coach'}</h1>
+        <p className="text-gray-600 text-sm sm:text-base">Manage your team and monitor their performance</p>
       </div>
 
       {/* Notification Center - Reduced padding and spacing */}
-      <div className="bg-white rounded-lg shadow p-4 mb-4">
+      <div className="bg-white rounded-lg shadow p-4 mb-4 sm:mb-6">
         <h2 className="text-lg font-semibold mb-2">Team Alerts</h2>
         <div className="space-y-2">
           {notifications.map((notification, index) => (
@@ -391,31 +394,31 @@ const CoachDashboard = () => {
                   : 'bg-blue-50 border border-blue-200'
               }`}
             >
-              <h3 className="font-semibold">{notification.title}</h3>
-              <p className="text-sm text-gray-600">{notification.message}</p>
+              <h3 className="font-semibold text-sm sm:text-base">{notification.title}</h3>
+              <p className="text-xs sm:text-sm text-gray-600">{notification.message}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* NEW: Automated Report Generation Section */}
-      <div className="bg-white rounded-lg shadow p-4 mb-4">
-        <div className="flex justify-between items-center mb-4">
+      <div className="bg-white rounded-lg shadow p-4 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-2 sm:space-y-0">
           <h2 className="text-lg font-semibold">Automated Report Generation</h2>
           <button
             onClick={scheduleAutomatedReports}
-            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 w-full sm:w-auto"
           >
             Schedule Auto-Reports
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <button
             onClick={() => generateAutomatedReport('injury')}
             disabled={isGeneratingReport}
             className="p-3 bg-red-50 border border-red-200 rounded hover:bg-red-100 disabled:opacity-50"
           >
-            <h3 className="font-medium text-red-800">Generate Injury Report</h3>
+            <h3 className="font-medium text-red-800 text-sm sm:text-base">Generate Injury Report</h3>
             <p className="text-xs text-red-600">Comprehensive injury risk analysis</p>
           </button>
           <button
@@ -423,7 +426,7 @@ const CoachDashboard = () => {
             disabled={isGeneratingReport}
             className="p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50"
           >
-            <h3 className="font-medium text-blue-800">Generate Team Report</h3>
+            <h3 className="font-medium text-blue-800 text-sm sm:text-base">Generate Team Report</h3>
             <p className="text-xs text-blue-600">Team performance overview</p>
           </button>
           <button
@@ -431,7 +434,7 @@ const CoachDashboard = () => {
             disabled={isGeneratingReport}
             className="p-3 bg-purple-50 border border-purple-200 rounded hover:bg-purple-100 disabled:opacity-50"
           >
-            <h3 className="font-medium text-purple-800">Generate Training Report</h3>
+            <h3 className="font-medium text-purple-800 text-sm sm:text-base">Generate Training Report</h3>
             <p className="text-xs text-purple-600">Training plan analysis</p>
           </button>
         </div>
@@ -444,13 +447,13 @@ const CoachDashboard = () => {
 
       {/* NEW: AI-Driven Training Adjustments */}
       {trainingAdjustments.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="bg-white rounded-lg shadow p-4 mb-4 sm:mb-6">
           <h2 className="text-lg font-semibold mb-4">AI-Generated Training Adjustments</h2>
           <div className="space-y-3">
             {trainingAdjustments.slice(0, 3).map((adjustment, index) => (
               <div key={index} className="border rounded-lg p-3">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-medium">{adjustment.athleteName}</h3>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 space-y-2 sm:space-y-0">
+                  <h3 className="font-medium text-sm sm:text-base">{adjustment.athleteName}</h3>
                   <span className={`px-2 py-1 rounded text-xs ${
                     adjustment.priority === 'high' ? 'bg-red-100 text-red-800' :
                     'bg-yellow-100 text-yellow-800'
@@ -458,7 +461,7 @@ const CoachDashboard = () => {
                     {adjustment.priority} Priority
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-xs sm:text-sm text-gray-600 mb-2">
                   Current Risk: {adjustment.currentRisk} | 
                   New Duration: {adjustment.adjustments.duration} minutes | 
                   Focus: {adjustment.adjustments.focus}
@@ -474,20 +477,20 @@ const CoachDashboard = () => {
 
       {/* NEW: Decision Support Insights */}
       {decisionSupport && (
-        <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="bg-white rounded-lg shadow p-4 mb-4 sm:mb-6">
           <h2 className="text-lg font-semibold mb-4">AI Decision Support</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-medium mb-2">Team Risk Analysis</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Team Risk Analysis</h3>
+              <p className="text-xs sm:text-sm text-gray-600">
                 Average Risk: {decisionSupport.overallRisk?.average?.toFixed(1) || 'N/A'}%<br/>
                 High Risk Athletes: {decisionSupport.overallRisk?.highRiskCount || 0}<br/>
                 Confidence: {decisionSupport.confidence || 'N/A'}%
               </p>
             </div>
             <div>
-              <h3 className="font-medium mb-2">Recommended Actions</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <h3 className="font-medium mb-2 text-sm sm:text-base">Recommended Actions</h3>
+              <ul className="text-xs sm:text-sm text-gray-600 space-y-1">
                 {decisionSupport.recommendations?.slice(0, 3).map((rec, index) => (
                   <li key={index} className="flex items-center">
                     <span className={`w-2 h-2 rounded-full mr-2 ${
@@ -503,15 +506,15 @@ const CoachDashboard = () => {
       )}
 
       {/* 3-column grid for main dashboard sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* AI Recommendations */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-2">AI-Generated Insights</h2>
           <div className="space-y-2">
             {aiInsights.map((insight) => (
               <div key={insight.title} className="bg-white rounded-lg shadow p-3">
-                <div className="flex justify-between items-start mb-1">
-                  <h3 className="font-medium text-gray-900">{insight.title}</h3>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1 space-y-2 sm:space-y-0">
+                  <h3 className="font-medium text-gray-900 text-sm sm:text-base">{insight.title}</h3>
                   <span className={`px-2 py-0.5 rounded-full text-xs ${
                     insight.priority === 'High' ? 'bg-red-100 text-red-800' :
                     'bg-yellow-100 text-yellow-800'
@@ -519,7 +522,7 @@ const CoachDashboard = () => {
                     {insight.priority} Priority
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
+                <p className="text-xs sm:text-sm text-gray-600 mb-2">{insight.description}</p>
                 <div className="text-xs text-gray-500">
                   Actions: {insight.actions.slice(0, 2).join(', ')}...
                 </div>
@@ -530,13 +533,13 @@ const CoachDashboard = () => {
 
         {/* Recent Athletes Activity */}
         <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold mb-2">Recent Athlete Activity</h2>
+          <h2 className="text-lg font-semibold mb-2">Recent Activity</h2>
           <div className="space-y-3">
             {recentAthletes.map((athlete) => (
-              <div key={athlete.id} className="flex items-center justify-between">
+              <div key={athlete.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                 <div>
-                  <h3 className="font-medium text-gray-900">{athlete.name}</h3>
-                  <p className="text-sm text-gray-500">Last active: {athlete.lastActive}</p>
+                  <h3 className="font-medium text-gray-900 text-sm sm:text-base">{athlete.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500">Last active: {athlete.lastActive}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className={`px-2 py-0.5 rounded-full text-xs ${
@@ -561,15 +564,15 @@ const CoachDashboard = () => {
           </div>
         </div>
 
-        {/* Upcoming Training Sessions */}
+        {/* Today's Training Sessions */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-2">Today's Training Sessions</h2>
           <div className="space-y-3">
             {upcomingTraining.map((session) => (
-              <div key={session.id} className="flex items-center justify-between">
+              <div key={session.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                 <div>
-                  <h3 className="font-medium text-gray-900">{session.title}</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-medium text-gray-900 text-sm sm:text-base">{session.title}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500">
                     {session.date} at {session.time}
                   </p>
                 </div>
@@ -583,14 +586,14 @@ const CoachDashboard = () => {
       </div>
 
       {/* 2-column grid for charts and performance sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
         {/* Performance Trends Chart */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-2">Performance Trends</h2>
-          <div className="h-64">
+          <div className="h-48 sm:h-64">
             {/* Chart component would go here */}
             <div className="flex flex-col h-full justify-center items-center">
-              <p className="text-gray-500">Team performance has improved by 10% over the last month</p>
+              <p className="text-gray-500 text-sm sm:text-base text-center">Team performance has improved by 10% over the last month</p>
             </div>
           </div>
         </div>
@@ -598,16 +601,16 @@ const CoachDashboard = () => {
         {/* Risk Analysis */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-lg font-semibold mb-2">Risk Analysis</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-red-50 p-3 rounded-lg">
-              <h3 className="font-medium text-red-800">High Risk Areas</h3>
-              <p className="text-sm text-gray-600">Shoulder strain (3 athletes)</p>
-              <p className="text-sm text-gray-600">Knee overextension (2 athletes)</p>
+              <h3 className="font-medium text-red-800 text-sm sm:text-base">High Risk Areas</h3>
+              <p className="text-xs sm:text-sm text-gray-600">Shoulder strain (3 athletes)</p>
+              <p className="text-xs sm:text-sm text-gray-600">Knee overextension (2 athletes)</p>
             </div>
             <div className="bg-green-50 p-3 rounded-lg">
-              <h3 className="font-medium text-green-800">Improving Areas</h3>
-              <p className="text-sm text-gray-600">Core stability (+12%)</p>
-              <p className="text-sm text-gray-600">Recovery time (+8%)</p>
+              <h3 className="font-medium text-green-800 text-sm sm:text-base">Improving Areas</h3>
+              <p className="text-xs sm:text-sm text-gray-600">Core stability (+12%)</p>
+              <p className="text-xs sm:text-sm text-gray-600">Recovery time (+8%)</p>
             </div>
           </div>
         </div>

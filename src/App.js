@@ -8,6 +8,7 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import HomePage from './pages/HomePage';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
 import AthleteDashboard from './pages/athlete/Dashboard';
 import CoachDashboard from './pages/coach/Dashboard';
 import AthleteProfile from './pages/athlete/Profile';
@@ -40,6 +41,7 @@ const App = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
 
                 {/* Athlete Routes */}
                 <Route path="/athlete" element={
