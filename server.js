@@ -76,20 +76,23 @@ app.get('/api/test-db', async (req, res) => {
 
 // Initialize database and start server
 async function startServer() {
-  try {
-    console.log('Starting server...');
-    await initializeDatabase();
-    console.log('Database initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize database:', error);
-    console.log('Server will start anyway with fallback mode');
-  }
-  
+  // Start server immediately
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Health check: http://localhost:${PORT}/api/health`);
     console.log(`API Base URL: http://localhost:${PORT}/api`);
   });
+  
+  // Initialize database in background
+  try {
+    console.log('Starting server...');
+    console.log('Initializing database in background...');
+    await initializeDatabase();
+    console.log('Database initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize database:', error.message);
+    console.log('Server running in fallback mode without database');
+  }
 }
 
 startServer(); 

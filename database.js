@@ -11,7 +11,7 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 60000, // 60 seconds
+  connectTimeout: 20000, // 20 seconds
   // SSL configuration for cloud databases
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   // Additional configuration
@@ -24,9 +24,13 @@ const pool = mysql.createPool(dbConfig);
 
 // Initialize database tables
 async function initializeDatabase() {
+  const timeout = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Database connection timeout')), 30000)
+  );
+  
   try {
     console.log('Attempting to connect to database...');
-    const connection = await pool.getConnection();
+    const connection = await Promise.race([pool.getConnection(), timeout]);
     console.log('Database connection successful!');
     
     // Create users table
