@@ -3,11 +3,11 @@ const mysql = require('mysql2/promise');
 
 // Database connection
 const dbConfig = {
-  host: process.env.DB_HOST || process.env.MYSQL_HOST || 'localhost',
-  port: process.env.DB_PORT || process.env.MYSQL_PORT || 3306,
-  user: process.env.DB_USER || process.env.MYSQL_USER || 'root',
-  password: process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD,
-  database: process.env.DB_NAME || process.env.MYSQL_DATABASE || 'badminton_injury',
+  host: process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost',
+  port: process.env.MYSQL_PORT || process.env.DB_PORT || 3306,
+  user: process.env.MYSQL_USER || process.env.DB_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD,
+  database: process.env.MYSQL_DATABASE || process.env.DB_NAME || 'railway',
   waitForConnections: true,
   connectionLimit: 5, // Reduced from 10
   queueLimit: 0,
