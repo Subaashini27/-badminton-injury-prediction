@@ -72,8 +72,8 @@ const fallbackAuth = {
           
           if (registeredUser) {
             const { password, ...userWithoutPassword } = registeredUser;
-            resolve({
-              data: {
+        resolve({
+          data: {
                 user: userWithoutPassword,
                 token: `demo-token-${registeredUser.role}-${Date.now()}`
               }
@@ -159,8 +159,8 @@ const apiService = {
         return response;
       } catch (error) {
         // Fallback for forgot password
-        return new Promise((resolve) => {
-          setTimeout(() => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
             resolve({ data: { message: 'Password reset email sent' } });
           }, 1000);
         });

@@ -9,9 +9,11 @@ const dbConfig = {
   password: process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD,
   database: process.env.DB_NAME || process.env.MYSQL_DATABASE || 'badminton_injury',
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 5, // Reduced from 10
   queueLimit: 0,
-  connectTimeout: 20000, // 20 seconds
+  connectTimeout: 10000, // Reduced from 20000 to 10 seconds
+  acquireTimeout: 10000, // Added timeout for acquiring connections
+  timeout: 10000, // Added query timeout
   // SSL configuration for cloud databases
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   // Additional configuration
@@ -25,7 +27,7 @@ const pool = mysql.createPool(dbConfig);
 // Initialize database tables
 async function initializeDatabase() {
   const timeout = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Database connection timeout')), 30000)
+    setTimeout(() => reject(new Error('Database connection timeout')), 15000) // Reduced from 30000
   );
   
   try {
@@ -209,7 +211,8 @@ async function initializeDatabase() {
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error.message);
-    throw error;
+    // Don't throw error, just log it
+    console.log('Server will continue without database initialization');
   }
 }
 
@@ -233,6 +236,7 @@ async function createDefaultAdmin(connection) {
     }
   } catch (error) {
     // Don't throw error here as it's not critical for system startup
+    console.log('Admin user creation skipped:', error.message);
   }
 }
 

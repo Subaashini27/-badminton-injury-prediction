@@ -19,9 +19,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// The database pool is now imported from 'database.js'
-// and the local dbConfig and pool are removed to avoid inconsistency.
-
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -53,46 +50,37 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/coaches', authenticateToken, coachRoutes);
-app.use('/api/athletes', authenticateToken, athleteRoutes);
-app.use('/api/feedback', authenticateToken, feedbackRoutes);
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
-});
-
 // Test DB connection route
 app.get('/api/test-db', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT 1');
     res.send('✅ Database connected successfully!');
   } catch (err) {
-    res.status(500).send('Database not connected');
+    res.status(500).send('❌ Database connection failed: ' + err.message);
   }
 });
 
-// Initialize database and start server
-async function startServer() {
-  // Start server immediately
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Health check: http://localhost:${PORT}/api/health`);
-    console.log(`API Base URL: http://localhost:${PORT}/api`);
-  });
-  
-  // Initialize database in background
-  try {
-    console.log('Starting server...');
-    console.log('Initializing database in background...');
-    await initializeDatabase();
-    console.log('Database initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize database:', error.message);
-    console.log('Server running in fallback mode without database');
-  }
-}
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/coaches', authenticateToken, coachRoutes);
+app.use('/api/athletes', authenticateToken, athleteRoutes);
+app.use('/api/feedback', authenticateToken, feedbackRoutes);
 
-startServer(); 
+// Start server immediately
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+});
+
+// Initialize database in background (non-blocking)
+setTimeout(async () => {
+  try {
+    console.log('🔄 Initializing database in background...');
+    await initializeDatabase();
+    console.log('✅ Database initialized successfully');
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error.message);
+    console.log('⚠️  Server running without database initialization');
+  }
+}, 1000); 

@@ -116,10 +116,10 @@ const AdminLayout = ({ children }) => {
                 <span className="text-gray-600">☰</span>
               </button>
               
-              <div>
+            <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-                  {navigationItems.find(item => isActiveRoute(item.path))?.name || 'Admin Dashboard'}
-                </h1>
+                {navigationItems.find(item => isActiveRoute(item.path))?.name || 'Admin Dashboard'}
+              </h1>
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
