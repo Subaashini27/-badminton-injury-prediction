@@ -1,16 +1,11 @@
 [build]
   command = "npm run build"
   publish = "build"
-  # Force redeploy with Railway backend
 
 [build.environment]
   NODE_VERSION = "18"
-  # Railway backend URL is now hardcoded in api.js
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
-
-[functions]
-  directory = "functions" 
+  status = 200 

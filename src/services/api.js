@@ -1,9 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-// Backend URL - use environment variable or fallback
-// Force Railway backend URL for production
-// Updated: 2025-01-16 - Force Railway backend connection
+// Railway backend URL - Production deployment
 const API_BASE_URL = 'https://vivacious-tenderness-production.up.railway.app';
 
 // Debug: Log the actual URL being used
