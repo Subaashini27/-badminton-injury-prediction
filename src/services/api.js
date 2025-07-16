@@ -5,9 +5,9 @@ import axios from 'axios';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://badminton-injury-prediction-81b9cd9a9f0b.herokuapp.com';
 
 // Debug: Log the actual URL being used
-console.log('🔗 API_BASE_URL:', API_BASE_URL);
-console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-console.log('🚀 FORCE DEPLOY - Updated at:', new Date().toISOString());
+// console.log('🔗 API_BASE_URL:', API_BASE_URL);
+// console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+// console.log('🚀 FORCE DEPLOY - Updated at:', new Date().toISOString());
 
 // Create axios instance
 const api = axios.create({
@@ -150,15 +150,15 @@ const apiService = {
 
     register: async (userData) => {
       try {
-        console.log('🔗 Attempting to register with backend:', `${API_BASE_URL}/api/auth/register`);
-        console.log('📤 Registration data:', userData);
+        // console.log('🔗 Attempting to register with backend:', `${API_BASE_URL}/api/auth/register`);
+        // console.log('📤 Registration data:', userData);
         const response = await api.post('/api/auth/register', userData);
-        console.log('✅ Registration successful:', response.data);
+        // console.log('✅ Registration successful:', response.data);
         return response;
       } catch (error) {
-        console.error('❌ Registration failed:', error.response?.status, error.response?.data || error.message);
+        // console.error('❌ Registration failed:', error.response?.status, error.response?.data || error.message);
         // Backend unavailable, using fallback registration
-        console.log('🔄 Using fallback registration...');
+        // console.log('🔄 Using fallback registration...');
         return fallbackAuth.register(userData);
       }
     },
