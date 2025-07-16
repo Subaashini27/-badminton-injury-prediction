@@ -4,22 +4,38 @@ const mysql = require('mysql2/promise');
 // Database connection
 const dbConfig = {
   host: process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost',
-  port: process.env.MYSQL_PORT || process.env.DB_PORT || 3306,
+  port: parseInt(process.env.MYSQL_PORT || process.env.DB_PORT || '3306'),
   user: process.env.MYSQL_USER || process.env.DB_USER || 'root',
   password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD,
   database: process.env.MYSQL_DATABASE || process.env.DB_NAME || 'railway',
   waitForConnections: true,
-  connectionLimit: 5, // Reduced from 10
+  connectionLimit: 5,
   queueLimit: 0,
-  connectTimeout: 10000, // Reduced from 20000 to 10 seconds
-  acquireTimeout: 10000, // Added timeout for acquiring connections
-  timeout: 10000, // Added query timeout
+  connectTimeout: 15000, // Increased timeout
+  acquireTimeout: 15000,
+  timeout: 15000,
   // SSL configuration for cloud databases
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false,
+    // Add explicit SSL mode for Railway
+    secureProtocol: 'TLSv1_2_method'
+  } : false,
   // Additional configuration
   timezone: '+00:00',
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
+  // Force IPv4 to avoid IPv6 localhost issues
+  family: 4
 };
+
+// Debug logging for connection config
+console.log('🔧 Database Configuration:', {
+  host: dbConfig.host,
+  port: dbConfig.port,
+  user: dbConfig.user,
+  database: dbConfig.database,
+  ssl: !!dbConfig.ssl,
+  environment: process.env.NODE_ENV
+});
 
 // Create connection pool
 const pool = mysql.createPool(dbConfig);
@@ -31,9 +47,14 @@ async function initializeDatabase() {
   );
   
   try {
-    console.log('Attempting to connect to database...');
+    console.log('🔄 Attempting to connect to database...');
+    console.log('🔗 Connection details:', {
+      host: dbConfig.host,
+      port: dbConfig.port,
+      database: dbConfig.database
+    });
     const connection = await Promise.race([pool.getConnection(), timeout]);
-    console.log('Database connection successful!');
+    console.log('✅ Database connection successful!');
     
     // Create users table
     await connection.execute(`
