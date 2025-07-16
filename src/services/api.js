@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 // Railway backend URL - Production deployment
-// FORCE CLEAN BUILD: 2025-01-17 01:01 AM
-const API_BASE_URL = 'https://vivacious-tenderness-production.up.railway.app';
+// FORCE CLEAN BUILD: 2025-07-16 17:25 PM
+const API_BASE_URL = 'https://badminton-injury-backend-production.up.railway.app';
 
 // Debug: Log the actual URL being used
 // console.log('🔗 API_BASE_URL:', API_BASE_URL);

@@ -13,7 +13,7 @@ export const useAuth = () => {
 
 // Create an axios instance for API calls
 const api = axios.create({
-  baseURL: '/api', // The proxy will handle redirecting this to http://localhost:5000/api
+  baseURL: 'https://badminton-injury-backend-production.up.railway.app/api', // Direct connection to Railway backend
 });
 
 // Add a request interceptor to include the token in headers
@@ -123,4 +123,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthContext; 
+export default AuthContext;
