@@ -18,6 +18,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'https://badminton-injury.live',
+    'https://www.badminton-injury.live',
+    'https://courageous-sundae-6c35ce.netlify.app',
     'https://badminton-injury-prediction.vercel.app',
     'https://badminton-injury-prediction-git-main.vercel.app',
     'https://badminton-injury-prediction-*.vercel.app'
