@@ -15,7 +15,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://badminton-injury-prediction.vercel.app',
+    'https://badminton-injury-prediction-git-main.vercel.app',
+    'https://badminton-injury-prediction-*.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -60,6 +70,12 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/coaches', authenticateToken, coachRoutes);
@@ -67,11 +83,11 @@ app.use('/api/athletes', authenticateToken, athleteRoutes);
 app.use('/api/feedback', authenticateToken, feedbackRoutes);
 
 // Start server immediately
-app.listen(PORT, () => {
+  app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-});
+  });
 
 // Initialize database in background (non-blocking)
 setTimeout(async () => {

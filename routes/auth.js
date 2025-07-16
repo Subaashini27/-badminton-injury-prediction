@@ -8,6 +8,11 @@ const router = express.Router();
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+// Test route to verify the router is working
+router.get('/test', (req, res) => {
+  res.json({ message: 'Auth router is working' });
+});
+
 // Register route
 router.post('/register', async (req, res) => {
   let connection;
@@ -61,6 +66,7 @@ router.post('/register', async (req, res) => {
       user: { id: userId, name, email, role }
     });
   } catch (error) {
+    console.error('Registration error:', error);
     if (error.code === 'ER_DUP_ENTRY') {
       res.status(400).json({ error: 'Email already exists' });
     } else if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
