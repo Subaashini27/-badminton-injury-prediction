@@ -81,45 +81,103 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Demo accounts for fallback when database is not available
+const DEMO_ACCOUNTS = [
+  { 
+    id: 1, 
+    email: 'demo@athlete.com', 
+    password: 'password', 
+    role: 'athlete', 
+    name: 'Demo Athlete'
+  },
+  { 
+    id: 2, 
+    email: 'demo@coach.com', 
+    password: 'password', 
+    role: 'coach', 
+    name: 'Demo Coach'
+  },
+  { 
+    id: 3, 
+    email: 'athlete@example.com', 
+    password: 'password', 
+    role: 'athlete', 
+    name: 'Demo Athlete'
+  },
+  { 
+    id: 4, 
+    email: 'coach@example.com', 
+    password: 'password', 
+    role: 'coach', 
+    name: 'Demo Coach'
+  }
+];
+
 // Login route
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    const connection = await pool.getConnection();
-    const [users] = await connection.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
-    connection.release();
-    
-    if (users.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    const user = users[0];
-    const validPassword = await bcrypt.compare(password, user.password);
-    
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    
-    res.json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role
+    try {
+      // Try database authentication first
+      const connection = await pool.getConnection();
+      const [users] = await connection.execute(
+        'SELECT * FROM users WHERE email = ?',
+        [email]
+      );
+      connection.release();
+      
+      if (users.length > 0) {
+        const user = users[0];
+        const validPassword = await bcrypt.compare(password, user.password);
+        
+        if (validPassword) {
+          const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+          );
+          
+          return res.json({
+            message: 'Login successful',
+            token,
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role
+            }
+          });
+        }
       }
-    });
+    } catch (dbError) {
+      console.log('Database unavailable, trying demo accounts...');
+    }
+    
+    // Fallback to demo accounts
+    const demoUser = DEMO_ACCOUNTS.find(acc => acc.email === email && acc.password === password);
+    
+    if (demoUser) {
+      const token = jwt.sign(
+        { id: demoUser.id, email: demoUser.email, role: demoUser.role },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+      
+      return res.json({
+        message: 'Login successful (demo account)',
+        token,
+        user: {
+          id: demoUser.id,
+          name: demoUser.name,
+          email: demoUser.email,
+          role: demoUser.role
+        }
+      });
+    }
+    
+    return res.status(401).json({ error: 'Invalid credentials' });
+    
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });

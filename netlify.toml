@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Update this URL once you deploy your backend to Railway
+  REACT_APP_API_URL = "https://badminton-injury-prediction-production.up.railway.app"
 
 [[redirects]]
   from = "/*"
