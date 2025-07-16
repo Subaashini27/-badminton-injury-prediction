@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Railway backend URL - Production deployment
-// FORCE UPDATE: 2025-01-17 12:46 AM
+// FORCE CLEAN BUILD: 2025-01-17 01:01 AM
 const API_BASE_URL = 'https://vivacious-tenderness-production.up.railway.app';
 
 // Debug: Log the actual URL being used
