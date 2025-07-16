@@ -5,8 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  # Update this URL once you deploy your backend to Railway
-  REACT_APP_API_URL = "https://vivacious-tenderness-production.up.railway.app"
+  # Railway backend URL is now hardcoded in api.js
 
 [[redirects]]
   from = "/*"

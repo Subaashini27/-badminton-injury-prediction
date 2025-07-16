@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 // Backend URL - use environment variable or fallback
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://vivacious-tenderness-production.up.railway.app';
+// Force Railway backend URL for production
+const API_BASE_URL = 'https://vivacious-tenderness-production.up.railway.app';
 
 // Debug: Log the actual URL being used
 // console.log('🔗 API_BASE_URL:', API_BASE_URL);
