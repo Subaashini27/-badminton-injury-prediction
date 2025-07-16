@@ -4,6 +4,10 @@ import axios from 'axios';
 // Backend URL - use environment variable or fallback
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+// Debug: Log the actual URL being used
+console.log('🔗 API_BASE_URL:', API_BASE_URL);
+console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
