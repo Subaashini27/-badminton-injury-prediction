@@ -2,12 +2,13 @@
 import axios from 'axios';
 
 // Railway backend URL - Production deployment
+// FORCE UPDATE: 2025-01-17 12:46 AM
 const API_BASE_URL = 'https://vivacious-tenderness-production.up.railway.app';
 
 // Debug: Log the actual URL being used
-// console.log('🔗 API_BASE_URL:', API_BASE_URL);
-// console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-// console.log('🚀 FORCE DEPLOY - Updated at:', new Date().toISOString());
+console.log('🔗 API_BASE_URL:', API_BASE_URL);
+console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('🚀 FORCE UPDATE - Updated at:', new Date().toISOString());
 
 // Create axios instance
 const api = axios.create({
