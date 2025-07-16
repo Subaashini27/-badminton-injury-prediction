@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "build"
+  # Force redeploy with Railway backend
 
 [build.environment]
   NODE_VERSION = "18"
