@@ -66,8 +66,8 @@ A comprehensive AI-powered system for monitoring and predicting injury risks in 
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/badminton-injury-prediction.git
-cd badminton-injury-prediction
+git clone https://github.com/yourusername/Smash-Trackers.git
+cd Smash-Trackers
 ```
 
 2. **Install dependencies**
@@ -126,7 +126,7 @@ npm start
 
 ### ⚙️ Admin Access
 - **Default Credentials**: 
-  - Email: `admin@badmintonsafe.com`
+  - Email: `admin@smashtrackers.com`
   - Password: `admin123`
 - **Features**: System management, user administration, AI monitoring
 - **Dashboard**: `/admin`
@@ -288,14 +288,14 @@ npm start
 ### Docker Deployment
 ```bash
 # Build Docker image
-docker build -t badminton-injury-prediction .
+docker build -t Smash-Trackers .
 
 # Run container
-docker run -p 3000:3000 -p 5000:5000 badminton-injury-prediction
+docker run -p 3000:3000 -p 5000:5000 Smash-Trackers
 ```
 
 ---
 
 **Made with ❤️ for the badminton community**
 
-*This project is designed to help badminton players improve their technique and reduce injury risks through AI-powered movement analysis.* 
+*This project is designed to help badminton players improve their technique and reduce injury risks through AI-powered movement analysis.*

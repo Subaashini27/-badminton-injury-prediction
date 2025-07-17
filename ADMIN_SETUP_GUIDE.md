@@ -27,7 +27,7 @@ When the server starts, you should see output similar to:
 
 ```
 ✅ Default admin user created successfully!
-📧 Email: admin@badmintonsafe.com
+📧 Email: admin@smashtrackers.com
 🔑 Password: admin123
 ⚠️  IMPORTANT: Change these credentials after first login!
 ```
@@ -39,7 +39,7 @@ When the server starts, you should see output similar to:
 1. **Open your browser** and go to your application (typically `http://localhost:3000`)
 2. **Click "Sign in"** or navigate to `/login`
 3. **Use the default admin credentials**:
-   - Email: `admin@badmintonsafe.com`
+   - Email: `admin@smashtrackers.com`
    - Password: `admin123`
 4. **You will be automatically redirected** to `/admin/dashboard`
 
@@ -195,4 +195,4 @@ After setting up admin access:
 
 ---
 
-**Remember**: The admin panel gives you full control over the system. Use these privileges responsibly and always follow security best practices. 
+**Remember**: The admin panel gives you full control over the system. Use these privileges responsibly and always follow security best practices.

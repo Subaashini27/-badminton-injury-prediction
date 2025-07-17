@@ -249,7 +249,7 @@ async function createDefaultAdmin(connection) {
       const hashedPassword = await bcrypt.hash('admin123', 10);
       await connection.execute(
         'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-        ['System Administrator', 'admin@badmintonsafe.com', hashedPassword, 'admin']
+        ['System Administrator', 'admin@smashtrackers.com', hashedPassword, 'admin']
       );
     }
   } catch (error) {

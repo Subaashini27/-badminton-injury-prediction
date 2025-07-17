@@ -27,7 +27,7 @@ const HomePage = () => {
       <div className="relative z-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <nav className="flex justify-between items-center mb-8 sm:mb-12 lg:mb-16">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">BadmintonSafe</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Smash Trackers</h1>
             <div className="flex space-x-2 sm:space-x-4">
               <Link
                 to="/login"
@@ -51,7 +51,7 @@ const HomePage = () => {
                 Enhance Performance
               </h2>
               <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-blue-100 leading-relaxed">
-                Welcome to BadmintonSafe, your AI-powered badminton movement analysis system. 
+                Welcome to Smash Trackers, your AI-powered badminton movement analysis system. 
                 Train smarter, play safer, and achieve your peak performance.
               </p>
               <div className="space-y-4 sm:space-y-4">
@@ -96,7 +96,7 @@ const HomePage = () => {
               <div className="relative bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-xl">
                 <h3 className="text-2xl font-bold text-blue-900 mb-4">Start Your Journey Today</h3>
                 <p className="text-gray-600 mb-6">
-                  Join athletes who are already using BadmintonSafe to:
+                  Join athletes who are already using Smash Trackers to:
                 </p>
                 <ul className="space-y-3 text-gray-700">
                   <li className="flex items-center">
@@ -133,4 +133,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;

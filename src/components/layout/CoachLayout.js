@@ -43,7 +43,7 @@ const CoachLayout = () => {
       }`}>
         <div>
           <div className="flex items-center justify-between p-4 sm:p-6">
-            <div className="text-xl sm:text-2xl font-bold">BadmintonSafe</div>
+            <div className="text-xl sm:text-2xl font-bold">Smash Trackers</div>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
               <FaTimes className="h-6 w-6" />
             </button>
@@ -104,4 +104,4 @@ const CoachLayout = () => {
   );
 };
 
-export default CoachLayout; 
+export default CoachLayout;
