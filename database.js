@@ -9,22 +9,15 @@ const dbConfig = {
   password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD,
   database: process.env.MYSQL_DATABASE || process.env.DB_NAME || 'railway',
   waitForConnections: true,
-  connectionLimit: 5,
+  connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 15000, // Increased timeout
-  acquireTimeout: 15000,
-  timeout: 15000,
   // SSL configuration for cloud databases
   ssl: process.env.NODE_ENV === 'production' ? { 
-    rejectUnauthorized: false,
-    // Add explicit SSL mode for Railway
-    secureProtocol: 'TLSv1_2_method'
+    rejectUnauthorized: false
   } : false,
   // Additional configuration
   timezone: '+00:00',
-  charset: 'utf8mb4',
-  // Force IPv4 to avoid IPv6 localhost issues
-  family: 4
+  charset: 'utf8mb4'
 };
 
 // Debug logging for connection config
@@ -34,7 +27,11 @@ console.log('🔧 Database Configuration:', {
   user: dbConfig.user,
   database: dbConfig.database,
   ssl: !!dbConfig.ssl,
-  environment: process.env.NODE_ENV
+  sslDetails: dbConfig.ssl,
+  environment: process.env.NODE_ENV,
+  NODE_ENV: process.env.NODE_ENV,
+  MYSQL_HOST: process.env.MYSQL_HOST,
+  DB_HOST: process.env.DB_HOST
 });
 
 // Create connection pool
@@ -43,7 +40,7 @@ const pool = mysql.createPool(dbConfig);
 // Initialize database tables
 async function initializeDatabase() {
   const timeout = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Database connection timeout')), 15000) // Reduced from 30000
+    setTimeout(() => reject(new Error('Database connection timeout')), 30000) // 30 seconds timeout
   );
   
   try {
@@ -261,4 +258,4 @@ async function createDefaultAdmin(connection) {
   }
 }
 
-module.exports = { pool, initializeDatabase }; 
+module.exports = { pool, initializeDatabase };
