@@ -146,6 +146,14 @@ export const usePoseDetection = ({
         videoRef.current.addEventListener('error', onError, { once: true });
       });
 
+      // Start playing the video for analysis
+      try {
+        await videoRef.current.play();
+      } catch (playError) {
+        // Video autoplay might be blocked, but we can still analyze
+        console.warn('Video autoplay blocked, but analysis will continue');
+      }
+
       // Validate video dimensions
       const videoWidth = videoRef.current.videoWidth;
       const videoHeight = videoRef.current.videoHeight;

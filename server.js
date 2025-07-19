@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const coachRoutes = require('./routes/coaches');
 const athleteRoutes = require('./routes/athletes');
 const feedbackRoutes = require('./routes/feedback');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -81,6 +82,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/coaches', authenticateToken, coachRoutes);
 app.use('/api/athletes', authenticateToken, athleteRoutes);
 app.use('/api/feedback', authenticateToken, feedbackRoutes);
+app.use('/api/admin', authenticateToken, adminRoutes);
 
 // Start server immediately
   app.listen(PORT, () => {

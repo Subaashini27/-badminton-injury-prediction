@@ -33,32 +33,39 @@ const AdminDashboard = () => {
   const [modelPerformance, setModelPerformance] = useState(null);
   const [userActivity, setUserActivity] = useState(null);
   const [systemAlerts, setSystemAlerts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadSystemStats();
-    loadModelPerformance();
-    loadUserActivity();
-    loadSystemAlerts();
+    // Load mock data immediately to ensure content shows
+    loadMockData();
+    
+    // Then try to load real data in background
+    loadRealData();
   }, []);
 
-  const loadSystemStats = () => {
-    // Mock system statistics - in real app, this would come from backend
-    const stats = {
+  const loadMockData = () => {
+    // Mock system statistics
+    const mockStats = {
       totalUsers: 245,
-      activeUsers: 89,
+      athletes: 180,
+      coaches: 45,
+      admins: 5,
       totalSessions: 1240,
       todaySessions: 23,
+      highRiskDetections: 340,
       systemUptime: '99.8%',
       avgResponseTime: '0.12s',
-      totalPredictions: 15420,
-      highRiskDetections: 340
+      recentUsers: [
+        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'athlete' },
+        { id: 2, name: 'Sarah Johnson', email: 'sarah@example.com', role: 'coach' },
+        { id: 3, name: 'Mike Wilson', email: 'mike@example.com', role: 'athlete' },
+        { id: 4, name: 'Emily Chen', email: 'emily@example.com', role: 'athlete' },
+        { id: 5, name: 'David Brown', email: 'david@example.com', role: 'coach' }
+      ]
     };
-    setSystemStats(stats);
-  };
 
-  const loadModelPerformance = () => {
     // Mock AI model performance data
-    const performance = {
+    const mockPerformance = {
       accuracy: 94.2,
       precision: 91.8,
       recall: 93.5,
@@ -74,27 +81,21 @@ const AdminDashboard = () => {
         medium: 25,
         high: 10
       }
-    };
-    setModelPerformance(performance);
   };
 
-  const loadUserActivity = () => {
     // Mock user activity data
-    const activity = {
-      dailyActiveUsers: [45, 52, 48, 67, 71, 89, 78],
+    const mockActivity = {
+      dailySessions: [23, 34, 28, 41, 52, 67, 45],
       userRoles: {
         athletes: 180,
         coaches: 45,
         admins: 5
       },
-      sessionsPerDay: [23, 34, 28, 41, 52, 67, 45],
       avgSessionDuration: '18.5 min'
-    };
-    setUserActivity(activity);
   };
 
-  const loadSystemAlerts = () => {
-    const alerts = [
+    // Mock system alerts
+    const mockAlerts = [
       {
         id: 1,
         type: 'warning',
@@ -124,7 +125,43 @@ const AdminDashboard = () => {
         resolved: false
       }
     ];
-    setSystemAlerts(alerts);
+
+    setSystemStats(mockStats);
+    setModelPerformance(mockPerformance);
+    setUserActivity(mockActivity);
+    setSystemAlerts(mockAlerts);
+    setIsLoading(false);
+  };
+
+  const loadRealData = async () => {
+    try {
+      // Try to load real data from API
+      const adminService = await import('../../services/adminService');
+      
+      const [stats, performance, activity, alerts] = await Promise.allSettled([
+        adminService.default.getSystemStats(),
+        adminService.default.getModelPerformance(),
+        adminService.default.getUserActivity(),
+        adminService.default.getSystemAlerts()
+      ]);
+
+      if (stats.status === 'fulfilled') {
+        setSystemStats(stats.value);
+      }
+      if (performance.status === 'fulfilled') {
+        setModelPerformance(performance.value);
+      }
+      if (activity.status === 'fulfilled') {
+        setUserActivity(activity.value);
+      }
+      if (alerts.status === 'fulfilled') {
+        setSystemAlerts(alerts.value);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load real data:', error);
+      // Keep mock data if real data fails
+    }
   };
 
   const renderMetricCard = (title, value, subtitle, icon, color = 'blue') => (
@@ -161,17 +198,10 @@ const AdminDashboard = () => {
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     datasets: [
       {
-        label: 'Daily Active Users',
-        data: userActivity?.dailyActiveUsers || [],
+        label: 'Daily Sessions',
+        data: userActivity?.dailySessions || [],
         backgroundColor: '#10B981',
         borderColor: '#059669',
-        borderWidth: 1
-      },
-      {
-        label: 'Sessions per Day',
-        data: userActivity?.sessionsPerDay || [],
-        backgroundColor: '#F59E0B',
-        borderColor: '#D97706',
         borderWidth: 1
       }
     ]
@@ -208,7 +238,7 @@ const AdminDashboard = () => {
     },
   };
 
-  if (!systemStats || !modelPerformance || !userActivity) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
@@ -257,10 +287,10 @@ const AdminDashboard = () => {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        {renderMetricCard('Total Users', systemStats.totalUsers, `${systemStats.activeUsers} active today`, '👥', '#3B82F6')}
-        {renderMetricCard('Model Accuracy', `${modelPerformance.accuracy}%`, 'Current performance', '🎯', '#10B981')}
-        {renderMetricCard('System Uptime', systemStats.systemUptime, `${systemStats.avgResponseTime} avg response`, '⚡', '#F59E0B')}
-        {renderMetricCard('High Risk Alerts', systemStats.highRiskDetections, 'Total detections', '⚠️', '#EF4444')}
+        {renderMetricCard('Total Users', systemStats?.totalUsers || 0, `${systemStats?.athletes || 0} athletes, ${systemStats?.coaches || 0} coaches`, '👥', '#3B82F6')}
+        {renderMetricCard('Model Accuracy', `${modelPerformance?.accuracy || 0}%`, 'Current performance', '🎯', '#10B981')}
+        {renderMetricCard('System Uptime', systemStats?.systemUptime || '99.8%', `${systemStats?.avgResponseTime || '0.12s'} avg response`, '⚡', '#F59E0B')}
+        {renderMetricCard('Total Sessions', systemStats?.totalSessions || 0, `${systemStats?.todaySessions || 0} today`, '📊', '#EF4444')}
       </div>
 
       {/* Charts Section */}
@@ -274,11 +304,11 @@ const AdminDashboard = () => {
           <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-gray-600">Precision:</span>
-              <span className="font-semibold ml-2">{modelPerformance.precision}%</span>
+              <span className="font-semibold ml-2">{modelPerformance?.precision || 0}%</span>
             </div>
             <div>
               <span className="text-gray-600">Recall:</span>
-              <span className="font-semibold ml-2">{modelPerformance.recall}%</span>
+              <span className="font-semibold ml-2">{modelPerformance?.recall || 0}%</span>
             </div>
           </div>
         </div>
@@ -290,7 +320,7 @@ const AdminDashboard = () => {
             <Bar data={userActivityData} options={chartOptions} />
           </div>
           <div className="mt-4 text-sm text-gray-600">
-            Average session duration: <span className="font-semibold">{userActivity.avgSessionDuration}</span>
+            Average session duration: <span className="font-semibold">{userActivity?.avgSessionDuration || '18.5 min'}</span>
           </div>
         </div>
       </div>
@@ -320,29 +350,29 @@ const AdminDashboard = () => {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-600">Model Version</p>
-                <p className="font-semibold">{modelPerformance.modelVersion}</p>
+                <p className="font-semibold">{modelPerformance?.modelVersion || 'v2.3.1'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Last Trained</p>
-                <p className="font-semibold">{modelPerformance.lastTrained}</p>
+                <p className="font-semibold">{modelPerformance?.lastTrained || '2024-01-15'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Training Data Size</p>
-                <p className="font-semibold">{modelPerformance.trainingDataSize}</p>
+                <p className="font-semibold">{modelPerformance?.trainingDataSize || '50,000 samples'}</p>
               </div>
             </div>
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-600">Predictions Today</p>
-                <p className="font-semibold">{modelPerformance.predictionsToday}</p>
+                <p className="font-semibold">{modelPerformance?.predictionsToday || 0}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Avg Processing Time</p>
-                <p className="font-semibold">{modelPerformance.avgProcessingTime}</p>
+                <p className="font-semibold">{modelPerformance?.avgProcessingTime || '0.08s'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">F1 Score</p>
-                <p className="font-semibold">{modelPerformance.f1Score}%</p>
+                <p className="font-semibold">{modelPerformance?.f1Score || 0}%</p>
               </div>
             </div>
           </div>
@@ -356,6 +386,64 @@ const AdminDashboard = () => {
             <button className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
               View Logs
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity and High Risk Alerts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Recent Users */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">👥 Recent Users</h3>
+          <div className="space-y-3">
+            {systemStats?.recentUsers ? (
+              systemStats.recentUsers.slice(0, 5).map((user, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">{user.name}</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user.role === 'athlete' ? 'bg-blue-100 text-blue-800' :
+                    user.role === 'coach' ? 'bg-green-100 text-green-800' :
+                    'bg-purple-100 text-purple-800'
+                  }`}>
+                    {user.role}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                <p>No recent users data available</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* High Risk Detections */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">⚠️ High Risk Detections</h3>
+          <div className="space-y-3">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-red-600 mb-2">
+                {systemStats?.highRiskDetections || 0}
+              </div>
+              <p className="text-gray-600">Total high-risk detections</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="text-center p-3 bg-red-50 rounded-lg">
+                <div className="text-xl font-bold text-red-600">
+                  {Math.round((systemStats?.highRiskDetections || 0) / (systemStats?.totalSessions || 1) * 100)}%
+                </div>
+                <p className="text-gray-600">Risk Rate</p>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg">
+                <div className="text-xl font-bold text-green-600">
+                  {systemStats?.totalSessions || 0}
+                </div>
+                <p className="text-gray-600">Total Sessions</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

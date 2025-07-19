@@ -2,7 +2,6 @@
 import axios from 'axios';
 
 // Railway backend URL - Production deployment
-// FORCE CLEAN BUILD: 2025-07-16 17:25 PM
 const API_BASE_URL = 'https://badminton-injury-backend-production.up.railway.app';
 
 // Debug: Log the actual URL being used

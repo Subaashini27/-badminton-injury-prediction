@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -9,8 +9,6 @@ const UserManagement = () => {
     search: ''
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [showUserModal, setShowUserModal] = useState(false);
   const [showCreateAdminModal, setShowCreateAdminModal] = useState(false);
   const [createAdminForm, setCreateAdminForm] = useState({
     name: '',
@@ -18,14 +16,13 @@ const UserManagement = () => {
     password: '',
     confirmPassword: ''
   });
-  const [createAdminLoading, setCreateAdminLoading] = useState(false);
   const [createAdminError, setCreateAdminError] = useState('');
 
   useEffect(() => {
     loadUsers();
   }, []);
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = React.useCallback(() => {
     let filtered = users;
     
     if (filters.role !== 'all') {
@@ -34,7 +31,7 @@ const UserManagement = () => {
     
     if (filters.status !== 'all') {
       filtered = filtered.filter(user => 
-        filters.status === 'active' ? user.isActive : !user.isActive
+        filters.status === 'active' ? user.status === 'active' : user.status !== 'active'
       );
     }
     
@@ -143,6 +140,7 @@ const UserManagement = () => {
     ];
 
     setUsers(mockUsers);
+    setFilteredUsers(mockUsers);
     setIsLoading(false);
   };
 
@@ -201,98 +199,31 @@ const UserManagement = () => {
           setUsers(prev => prev.filter(u => u.id !== userId));
         }
         break;
-      case 'view':
-        setSelectedUser(user);
-        setShowUserModal(true);
-        break;
       default:
         break;
     }
   };
 
   const exportUsers = () => {
-    const csv = [
-      'Name,Email,Role,Status,Last Login,Registration Date,Sessions Count',
-      ...filteredUsers.map(user => 
-        `"${user.name}","${user.email}","${user.role}","${user.status}","${user.lastLogin.toISOString()}","${user.registrationDate.toISOString()}","${user.sessionsCount}"`
-      )
-    ].join('\n');
+    const csvContent = [
+      ['Name', 'Email', 'Role', 'Status', 'Registration Date', 'Last Login'],
+      ...filteredUsers.map(user => [
+        user.name,
+        user.email,
+        user.role,
+        user.status,
+        user.registrationDate.toLocaleDateString(),
+        user.lastLogin.toLocaleDateString()
+      ])
+    ].map(row => row.join(',')).join('\n');
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `users-export-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = 'users_export.csv';
     a.click();
     window.URL.revokeObjectURL(url);
-  };
-
-  const handleCreateAdmin = async (e) => {
-    e.preventDefault();
-    
-    if (createAdminForm.password !== createAdminForm.confirmPassword) {
-      setCreateAdminError('Passwords do not match');
-      return;
-    }
-    
-    if (createAdminForm.password.length < 8) {
-      setCreateAdminError('Password must be at least 8 characters long');
-      return;
-    }
-    
-    try {
-      setCreateAdminLoading(true);
-      setCreateAdminError('');
-      
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/auth/create-admin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          name: createAdminForm.name,
-          email: createAdminForm.email,
-          password: createAdminForm.password
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create admin user');
-      }
-      
-      // Reset form and close modal
-      setCreateAdminForm({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-      setShowCreateAdminModal(false);
-      
-      // Reload users list
-      loadUsers();
-      
-      // Show success message
-      alert('Admin user created successfully!');
-      
-    } catch (error) {
-      setCreateAdminError(error.message);
-    } finally {
-      setCreateAdminLoading(false);
-    }
-  };
-
-  const handleCreateAdminChange = (e) => {
-    const { name, value } = e.target;
-    setCreateAdminForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (createAdminError) setCreateAdminError('');
   };
 
   if (isLoading) {
@@ -309,106 +240,93 @@ const UserManagement = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage system users and their permissions</p>
-        </div>
-        <div className="flex space-x-3">
-          <button 
-            onClick={exportUsers}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-          >
-            Export Users
-          </button>
-          <button 
-            onClick={() => setShowCreateAdminModal(true)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
-          >
-            Create Admin
-          </button>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Add New User
-          </button>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+        <p className="text-gray-600">Manage system users and their permissions</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
-          <h3 className="text-sm font-medium text-gray-600">Total Users</h3>
-          <p className="text-2xl font-bold text-blue-600">{users.length}</p>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800">Total Users</h3>
+          <p className="text-3xl font-bold text-blue-600">{users.length}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
-          <h3 className="text-sm font-medium text-gray-600">Active Users</h3>
-          <p className="text-2xl font-bold text-green-600">
-            {users.filter(user => user.status === 'active').length}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800">Active Users</h3>
+          <p className="text-3xl font-bold text-green-600">
+            {users.filter(u => u.status === 'active').length}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md border-l-4 border-yellow-500">
-          <h3 className="text-sm font-medium text-gray-600">Athletes</h3>
-          <p className="text-2xl font-bold text-yellow-600">
-            {users.filter(user => user.role === 'athlete').length}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800">Athletes</h3>
+          <p className="text-3xl font-bold text-purple-600">
+            {users.filter(u => u.role === 'athlete').length}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md border-l-4 border-purple-500">
-          <h3 className="text-sm font-medium text-gray-600">Coaches</h3>
-          <p className="text-2xl font-bold text-purple-600">
-            {users.filter(user => user.role === 'coach').length}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800">Coaches</h3>
+          <p className="text-3xl font-bold text-orange-600">
+            {users.filter(u => u.role === 'coach').length}
           </p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-            <select 
+      {/* Filters and Actions */}
+      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col md:flex-row gap-4">
+            <select
               value={filters.role}
               onChange={(e) => handleFilterChange('role', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Roles</option>
               <option value="athlete">Athletes</option>
               <option value="coach">Coaches</option>
               <option value="admin">Admins</option>
             </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-            <select 
+
+            <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="all">All Statuses</option>
+              <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
               <option value="suspended">Suspended</option>
             </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+
             <input
               type="text"
+              placeholder="Search users..."
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              placeholder="Search by name or email..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-        </div>
-        <div className="mt-4 text-sm text-gray-600">
-          Showing {filteredUsers.length} of {users.length} users
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowCreateAdminModal(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Create Admin
+            </button>
+            <button
+              onClick={exportUsers}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            >
+              Export Users
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Users Table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -421,10 +339,10 @@ const UserManagement = () => {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
+                  Activity
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stats
+                  Last Login
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -434,11 +352,13 @@ const UserManagement = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                          {user.name.split(' ').map(n => n[0]).join('')}
+                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-700">
+                            {user.name.split(' ').map(n => n[0]).join('')}
+                          </span>
                         </div>
                       </div>
                       <div className="ml-4">
@@ -448,67 +368,63 @@ const UserManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      user.role === 'athlete' ? 'bg-blue-100 text-blue-800' :
+                      user.role === 'coach' ? 'bg-green-100 text-green-800' :
+                      'bg-purple-100 text-purple-800'
+                    }`}>
+                      {user.role}
                     </span>
+                    {user.riskLevel && (
+                      <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${getRiskColor(user.riskLevel)}`}>
+                        {user.riskLevel} risk
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.status)}`}>
-                      {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(user.status)}`}>
+                      {user.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.lastLogin.toLocaleDateString()}
-                    <div className="text-xs text-gray-500">
-                      {user.lastLogin.toLocaleTimeString()}
-                    </div>
+                    {user.role === 'athlete' ? (
+                      <div>
+                        <div>{user.sessionsCount} sessions</div>
+                        <div className="text-gray-500">{user.injuryReports} injury reports</div>
+                      </div>
+                    ) : user.role === 'coach' ? (
+                      <div>
+                        <div>{user.managedAthletes} athletes</div>
+                        <div className="text-gray-500">{user.reportsGenerated} reports</div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div>{user.systemActions} actions</div>
+                        <div className="text-gray-500">System admin</div>
+                      </div>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="text-xs space-y-1">
-                      <div>Sessions: {user.sessionsCount}</div>
-                      {user.role === 'athlete' && (
-                        <>
-                          <div>Injuries: {user.injuryReports}</div>
-                          <span className={`inline-flex px-1 py-0.5 text-xs rounded ${getRiskColor(user.riskLevel)}`}>
-                            {user.riskLevel} risk
-                          </span>
-                        </>
-                      )}
-                      {user.role === 'coach' && (
-                        <>
-                          <div>Athletes: {user.managedAthletes}</div>
-                          <div>Reports: {user.reportsGenerated}</div>
-                        </>
-                      )}
-                      {user.role === 'admin' && (
-                        <div>Actions: {user.systemActions}</div>
-                      )}
-                    </div>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {user.lastLogin.toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button 
-                        onClick={() => handleUserAction(user.id, 'view')}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View
-                      </button>
                       {user.status === 'active' ? (
-                        <button 
+                        <button
                           onClick={() => handleUserAction(user.id, 'suspend')}
                           className="text-yellow-600 hover:text-yellow-900"
                         >
                           Suspend
                         </button>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => handleUserAction(user.id, 'activate')}
                           className="text-green-600 hover:text-green-900"
                         >
                           Activate
                         </button>
                       )}
-                      <button 
+                      <button
                         onClick={() => handleUserAction(user.id, 'delete')}
                         className="text-red-600 hover:text-red-900"
                       >
@@ -521,154 +437,77 @@ const UserManagement = () => {
             </tbody>
           </table>
         </div>
-        
-        {filteredUsers.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No users found matching the current filters.</p>
-          </div>
-        )}
       </div>
-
-      {/* User Detail Modal */}
-      {showUserModal && selectedUser && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">User Details</h3>
-              <button 
-                onClick={() => setShowUserModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <span className="text-sm font-medium text-gray-600">Name:</span>
-                <span className="ml-2">{selectedUser.name}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Email:</span>
-                <span className="ml-2">{selectedUser.email}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Role:</span>
-                <span className="ml-2 capitalize">{selectedUser.role}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Status:</span>
-                <span className={`ml-2 px-2 py-1 text-xs rounded ${getStatusColor(selectedUser.status)}`}>
-                  {selectedUser.status}
-                </span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Registration:</span>
-                <span className="ml-2">{selectedUser.registrationDate.toLocaleDateString()}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">Last Login:</span>
-                <span className="ml-2">{selectedUser.lastLogin.toLocaleString()}</span>
-              </div>
-              {selectedUser.suspensionReason && (
-                <div>
-                  <span className="text-sm font-medium text-gray-600">Suspension Reason:</span>
-                  <span className="ml-2 text-red-600">{selectedUser.suspensionReason}</span>
-                </div>
-              )}
-            </div>
-            <div className="mt-6 flex justify-end space-x-3">
-              <button 
-                onClick={() => setShowUserModal(false)}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                Close
-              </button>
-              <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
-                Edit User
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Create Admin Modal */}
       {showCreateAdminModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Create New Admin User</h3>
-              <button 
-                onClick={() => setShowCreateAdminModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Admin User</h3>
+              <form onSubmit={(e) => e.preventDefault()}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <input
+                      type="text"
+                      value={createAdminForm.name}
+                      onChange={(e) => setCreateAdminForm(prev => ({ ...prev, name: e.target.value }))}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                      type="email"
+                      value={createAdminForm.email}
+                      onChange={(e) => setCreateAdminForm(prev => ({ ...prev, email: e.target.value }))}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Password</label>
+                    <input
+                      type="password"
+                      value={createAdminForm.password}
+                      onChange={(e) => setCreateAdminForm(prev => ({ ...prev, password: e.target.value }))}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input
+                      type="password"
+                      value={createAdminForm.confirmPassword}
+                      onChange={(e) => setCreateAdminForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+                {createAdminError && (
+                  <p className="mt-2 text-sm text-red-600">{createAdminError}</p>
+                )}
+                <div className="mt-6 flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateAdminModal(false)}
+                    className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Create Admin
+                  </button>
+                </div>
+              </form>
             </div>
-            <form onSubmit={handleCreateAdmin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={createAdminForm.name}
-                  onChange={handleCreateAdminChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={createAdminForm.email}
-                  onChange={handleCreateAdminChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={createAdminForm.password}
-                  onChange={handleCreateAdminChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={createAdminForm.confirmPassword}
-                  onChange={handleCreateAdminChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              {createAdminError && (
-                <p className="text-red-500 text-sm">{createAdminError}</p>
-              )}
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateAdminModal(false)}
-                  className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createAdminLoading}
-                  className="px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {createAdminLoading ? 'Creating...' : 'Create Admin'}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
