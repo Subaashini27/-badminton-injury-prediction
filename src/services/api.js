@@ -51,6 +51,15 @@ const DEMO_ACCOUNTS = [
     role: 'coach', 
     name: 'Demo Coach',
     fullName: 'Demo Coach'
+  },
+  // Admin account for immediate access
+  { 
+    id: 5, 
+    email: 'admin@badmintonsafe.com', 
+    password: 'admin123', 
+    role: 'admin', 
+    name: 'Admin User',
+    fullName: 'System Administrator'
   }
 ];
 
