@@ -85,11 +85,20 @@ app.use('/api/feedback', authenticateToken, feedbackRoutes);
 app.use('/api/admin', authenticateToken, adminRoutes);
 
 // Start server immediately
-  app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+try {
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
   });
+  
+  server.on('error', (error) => {
+    console.error('❌ Server error:', error);
+  });
+} catch (error) {
+  console.error('❌ Failed to start server:', error);
+  process.exit(1);
+}
 
 // Initialize database in background (non-blocking)
 setTimeout(async () => {
@@ -101,4 +110,4 @@ setTimeout(async () => {
     console.error('❌ Database initialization failed:', error.message);
     console.log('⚠️  Server running without database initialization');
   }
-}, 1000); 
+}, 1000);

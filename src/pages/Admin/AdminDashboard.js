@@ -46,29 +46,55 @@ const AdminDashboard = () => {
    * a quick overview of system health and performance
    */
   const fetchDashboardStats = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      console.log('Fetching dashboard stats...');
       
-      // In a real application, this would fetch from your backend API
-      // For now, we'll simulate with mock data
-      const mockStats = {
-        totalUsers: 156,
-        activeUsers: 89,
-        totalLogs: 2340,
-        criticalErrors: 3,
-        modelAccuracy: 94.2,
-        lastModelUpdate: new Date('2024-01-15T10:30:00Z'),
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      // Make actual API call to fetch admin stats
+      const response = await fetch('/api/admin/stats', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const stats = await response.json();
+      console.log('Dashboard stats received:', stats);
+      
+      setDashboardStats({
+        totalUsers: stats.totalUsers || 0,
+        activeUsers: stats.athletes + stats.coaches || 0,
+        totalLogs: stats.totalSessions || 0,
+        criticalErrors: stats.highRiskDetections || 0,
+        modelAccuracy: stats.avgScore ? (stats.avgScore * 100).toFixed(1) : 0,
+        lastModelUpdate: new Date(),
         systemHealth: 'Good'
-      };
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setDashboardStats(mockStats);
+      });
       setError(null);
     } catch (err) {
-      // Error fetching dashboard stats
-      setError('Failed to load dashboard statistics');
+      console.error('Error fetching dashboard stats:', err);
+      setError(`Failed to load dashboard statistics: ${err.message}`);
+      
+      // Fallback to mock data if API fails
+      setDashboardStats({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalLogs: 0,
+        criticalErrors: 0,
+        modelAccuracy: 0,
+        lastModelUpdate: new Date(),
+        systemHealth: 'Unknown'
+      });
     } finally {
       setLoading(false);
     }
@@ -420,4 +446,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;
