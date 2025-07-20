@@ -16,10 +16,15 @@ import CoachTrainingPlans from './pages/coach/TrainingPlans';
 import CoachInjuryReports from './pages/coach/CoachInjuryReports';
 import Reports from './pages/coach/Reports';
 import TrainingManagement from './pages/coach/TrainingManagement';
+import AdminDashboard from './pages/Admin/Dashboard';
+import AIModelMonitoring from './pages/Admin/AIModelMonitoring';
+import UserManagement from './pages/Admin/UserManagement';
+import SystemLogs from './pages/Admin/SystemLogs';
 import AuthGuard from './pages/auth/AuthGuard';
 import HomePage from './pages/HomePage';
 import AthleteLayout from './components/layout/AthleteLayout';
 import CoachLayout from './components/layout/CoachLayout';
+import AdminLayout from './components/layout/AdminLayout';
 import { AnalysisProvider } from './context/AnalysisContext';
 
 // Simple placeholder component for routes that aren't fully implemented yet
@@ -79,12 +84,28 @@ const AppRoutes = () => {
         <Route path="training-management" element={<TrainingManagement />} />
       </Route>
 
+      {/* Admin Routes */}
+      <Route path="/admin" element={
+        <AuthGuard allowedRoles={['admin']}>
+          <AdminLayout />
+        </AuthGuard>
+      }>
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="ai-monitoring" element={<AIModelMonitoring />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="logs" element={<SystemLogs />} />
+      </Route>
+
       {/* Legacy routes for backward compatibility */}
       <Route path="/athlete-dashboard" element={
         <Navigate to="/athlete" replace />
       } />
       <Route path="/coach-dashboard" element={
         <Navigate to="/coach" replace />
+      } />
+      <Route path="/admin-dashboard" element={
+        <Navigate to="/admin/dashboard" replace />
       } />
 
       {/* Default route - catch all unmatched routes */}
