@@ -36,77 +36,44 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Invalid role. Must be either "athlete" or "coach"' });
     }
     
-    try {
-      // Try database registration first
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      connection = await pool.getConnection();
-      
-      // Check if email already exists
-      const [existingUsers] = await connection.execute(
-        'SELECT id FROM users WHERE email = ?',
-        [email]
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    connection = await pool.getConnection();
+    
+    // Create user
+    const [userResult] = await connection.execute(
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, role]
+    );
+    
+    const userId = userResult.insertId;
+    
+    // If registering as athlete, create athlete record
+    if (role === 'athlete') {
+      await connection.execute(
+        'INSERT INTO athletes (user_id) VALUES (?)',
+        [userId]
       );
-      
-      if (existingUsers.length > 0) {
-        connection.release();
-        return res.status(400).json({ error: 'Email already exists' });
-      }
-      
-      // Create user
-      const [userResult] = await connection.execute(
-        'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-        [name, email, hashedPassword, role]
-      );
-      
-      const userId = userResult.insertId;
-      
-      // If registering as athlete, create athlete record
-      if (role === 'athlete') {
-        await connection.execute(
-          'INSERT INTO athletes (user_id) VALUES (?)',
-          [userId]
-        );
-      }
-      
-      connection.release();
-      
-      // Generate JWT token
-      const token = jwt.sign({ id: userId, email, role }, JWT_SECRET, { expiresIn: '24h' });
-      
-      return res.status(201).json({
-        message: 'User registered successfully',
-        token,
-        user: { id: userId, name, email, role }
-      });
-      
-    } catch (dbError) {
-      console.log('Database unavailable during registration, using demo mode...');
-      
-      // Check if email already exists in demo accounts
-      const existingDemo = DEMO_ACCOUNTS.find(acc => acc.email === email);
-      if (existingDemo) {
-        return res.status(400).json({ error: 'Email already exists' });
-      }
-      
-      // Create a demo user ID (use timestamp to make it unique)
-      const demoUserId = Date.now();
-      
-      // Generate JWT token for demo user
-      const token = jwt.sign({ id: demoUserId, email, role }, JWT_SECRET, { expiresIn: '24h' });
-      
-      return res.status(201).json({
-        message: 'User registered successfully (demo mode - database unavailable)',
-        token,
-        user: { id: demoUserId, name, email, role },
-        demo: true
-      });
     }
     
+    // Generate JWT token
+    const token = jwt.sign({ id: userId, email, role }, JWT_SECRET, { expiresIn: '24h' });
+    
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user: { id: userId, name, email, role }
+    });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed: ' + error.message });
+    if (error.code === 'ER_DUP_ENTRY') {
+      res.status(400).json({ error: 'Email already exists' });
+    } else if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+      res.status(500).json({ error: 'Database connection failed' });
+    } else {
+      res.status(500).json({ error: 'Registration failed: ' + error.message });
+    }
   } finally {
     if (connection) {
       connection.release();
@@ -282,4 +249,4 @@ router.post('/create-admin', requireAdmin, async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; 

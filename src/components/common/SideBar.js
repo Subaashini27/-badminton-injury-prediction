@@ -44,7 +44,7 @@ const SideBar = ({ isSidebarOpen, setSidebarOpen }) => {
       >
         <div>
           <div className="flex items-center justify-between p-6">
-            <h1 className="text-2xl font-bold">Smash Trackers</h1>
+            <h1 className="text-2xl font-bold">BadmintonSafe</h1>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
               <FaTimes className="h-6 w-6" />
             </button>

@@ -6,15 +6,15 @@ const SystemLogs = () => {
   useEffect(() => {
     // Demo/mock data
     setLogs([
-      { timestamp: '2024-07-13 20:00', user: 'admin@smashtrackers.com', action: 'Logged in', status: 'Success' },
-      { timestamp: '2024-07-13 20:01', user: 'admin@smashtrackers.com', action: 'Viewed User Management', status: 'Success' },
-      { timestamp: '2024-07-13 20:02', user: 'admin@smashtrackers.com', action: 'Created new admin', status: 'Success' },
+      { timestamp: '2024-07-13 20:00', user: 'admin@badmintonsafe.com', action: 'Logged in', status: 'Success' },
+      { timestamp: '2024-07-13 20:01', user: 'admin@badmintonsafe.com', action: 'Viewed User Management', status: 'Success' },
+      { timestamp: '2024-07-13 20:02', user: 'admin@badmintonsafe.com', action: 'Created new admin', status: 'Success' },
       { timestamp: '2024-07-13 20:05', user: 'coach@example.com', action: 'Logged in', status: 'Success' },
       { timestamp: '2024-07-13 20:06', user: 'coach@example.com', action: 'Viewed Athlete List', status: 'Success' },
       { timestamp: '2024-07-13 20:10', user: 'athlete@example.com', action: 'Logged in', status: 'Success' },
       { timestamp: '2024-07-13 20:12', user: 'athlete@example.com', action: 'Submitted Injury Report', status: 'Success' },
-      { timestamp: '2024-07-13 20:15', user: 'admin@smashtrackers.com', action: 'Exported User Data', status: 'Success' },
-      { timestamp: '2024-07-13 20:20', user: 'admin@smashtrackers.com', action: 'Logged out', status: 'Success' },
+      { timestamp: '2024-07-13 20:15', user: 'admin@badmintonsafe.com', action: 'Exported User Data', status: 'Success' },
+      { timestamp: '2024-07-13 20:20', user: 'admin@badmintonsafe.com', action: 'Logged out', status: 'Success' },
     ]);
   }, []);
 

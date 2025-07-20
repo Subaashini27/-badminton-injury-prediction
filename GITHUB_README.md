@@ -126,7 +126,7 @@ npm start
 
 ### ⚙️ Admin Access
 - **Default Credentials**: 
-  - Email: `admin@smashtrackers.com`
+  - Email: `admin@badmintonsafe.com`
   - Password: `admin123`
 - **Features**: System management, user administration, AI monitoring
 - **Dashboard**: `/admin`
