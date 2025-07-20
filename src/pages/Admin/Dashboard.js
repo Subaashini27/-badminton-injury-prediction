@@ -36,14 +36,18 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AdminDashboard: Component mounted');
     // Load mock data immediately to ensure content shows
     loadMockData();
     
-    // Then try to load real data in background
-    loadRealData();
+    // Try to load real data in background (optional)
+    setTimeout(() => {
+      loadRealData();
+    }, 1000);
   }, []);
 
   const loadMockData = () => {
+    console.log('AdminDashboard: Loading mock data');
     // Mock system statistics
     const mockStats = {
       totalUsers: 245,
@@ -81,7 +85,7 @@ const AdminDashboard = () => {
         medium: 25,
         high: 10
       }
-  };
+    };
 
     // Mock user activity data
     const mockActivity = {
@@ -92,7 +96,7 @@ const AdminDashboard = () => {
         admins: 5
       },
       avgSessionDuration: '18.5 min'
-  };
+    };
 
     // Mock system alerts
     const mockAlerts = [
@@ -131,36 +135,40 @@ const AdminDashboard = () => {
     setUserActivity(mockActivity);
     setSystemAlerts(mockAlerts);
     setIsLoading(false);
+    console.log('AdminDashboard: Mock data loaded successfully');
   };
 
   const loadRealData = async () => {
     try {
-      // Try to load real data from API
-      const adminService = await import('../../services/adminService');
+      // Simple fetch without dynamic import
+      const baseURL = process.env.REACT_APP_API_URL || 'https://badminton-injury-prediction-production.up.railway.app';
       
-      const [stats, performance, activity, alerts] = await Promise.allSettled([
-        adminService.default.getSystemStats(),
-        adminService.default.getModelPerformance(),
-        adminService.default.getUserActivity(),
-        adminService.default.getSystemAlerts()
+      const [statsRes, performanceRes, activityRes, alertsRes] = await Promise.allSettled([
+        fetch(`${baseURL}/admin/stats`),
+        fetch(`${baseURL}/admin/model-performance`),
+        fetch(`${baseURL}/admin/user-activity`),
+        fetch(`${baseURL}/admin/alerts`)
       ]);
 
-      if (stats.status === 'fulfilled') {
-        setSystemStats(stats.value);
+      if (statsRes.status === 'fulfilled' && statsRes.value.ok) {
+        const stats = await statsRes.value.json();
+        setSystemStats(stats);
       }
-      if (performance.status === 'fulfilled') {
-        setModelPerformance(performance.value);
+      if (performanceRes.status === 'fulfilled' && performanceRes.value.ok) {
+        const performance = await performanceRes.value.json();
+        setModelPerformance(performance);
       }
-      if (activity.status === 'fulfilled') {
-        setUserActivity(activity.value);
+      if (activityRes.status === 'fulfilled' && activityRes.value.ok) {
+        const activity = await activityRes.value.json();
+        setUserActivity(activity);
       }
-      if (alerts.status === 'fulfilled') {
-        setSystemAlerts(alerts.value);
+      if (alertsRes.status === 'fulfilled' && alertsRes.value.ok) {
+        const alerts = await alertsRes.value.json();
+        setSystemAlerts(alerts);
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to load real data:', error);
       // Keep mock data if real data fails
+      console.log('Using mock data for admin dashboard');
     }
   };
 
@@ -244,6 +252,31 @@ const AdminDashboard = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback if no data is available
+  if (!systemStats && !modelPerformance && !userActivity) {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+          <p className="text-gray-600">System monitoring and AI model management</p>
+        </div>
+        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Dashboard Loading...</h2>
+          <p className="text-gray-600 mb-4">The admin dashboard is initializing. Please wait a moment.</p>
+          <button 
+            onClick={() => {
+              console.log('AdminDashboard: Manual refresh triggered');
+              loadMockData();
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Refresh Dashboard
+          </button>
         </div>
       </div>
     );
