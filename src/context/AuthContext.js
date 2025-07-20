@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import apiService from '../services/api';
 
 const AuthContext = createContext();
 
@@ -10,20 +10,6 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Create an axios instance for API calls
-const api = axios.create({
-  baseURL: 'https://badminton-injury-backend-production.up.railway.app/api', // Direct connection to Railway backend
-});
-
-// Add a request interceptor to include the token in headers
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -55,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await apiService.auth.login(email, password);
       const { user, token } = response.data;
       
       localStorage.setItem('user', JSON.stringify(user));
@@ -64,14 +50,14 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
       return user;
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
+      const errorMessage = error.message || 'Login failed. Please try again.';
       throw new Error(errorMessage);
     }
   };
 
   const register = async (userData) => {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await apiService.auth.register(userData);
       const { user, token } = response.data;
 
       localStorage.setItem('user', JSON.stringify(user));
@@ -81,7 +67,7 @@ export const AuthProvider = ({ children }) => {
       // It's common to log the user in right after registration
       return user;
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
+      const errorMessage = error.message || 'Registration failed. Please try again.';
       throw new Error(errorMessage);
     }
   };
