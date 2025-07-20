@@ -154,12 +154,23 @@ const apiService = {
   // Authentication endpoints
   auth: {
     login: async (email, password) => {
+      // For admin users, try fallback first to ensure immediate access
+      if (email === 'admin@badmintonsafe.com') {
+        console.log('Admin login detected, using fallback authentication');
+        try {
+          return await fallbackAuth.login(email, password);
+        } catch (fallbackError) {
+          console.log('Fallback failed, trying backend:', fallbackError);
+        }
+      }
+      
       try {
         const response = await api.post('/api/auth/login', { email, password });
         return response;
       } catch (error) {
         // If we get a 401 error or any other error, use fallback authentication
         console.log('Backend authentication failed, using fallback for:', email);
+        console.log('Error details:', error.response?.status, error.response?.data);
         return fallbackAuth.login(email, password);
       }
     },
