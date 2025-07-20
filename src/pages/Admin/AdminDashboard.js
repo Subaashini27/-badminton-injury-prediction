@@ -55,8 +55,8 @@ const AdminDashboard = () => {
         throw new Error('No authentication token found');
       }
       
-      // Make actual API call to fetch admin stats
-      const response = await fetch('/api/admin/stats', {
+      // Make actual API call to fetch admin stats using the correct backend URL
+      const response = await fetch('https://badminton-injury-backend-production.up.railway.app/api/admin/stats', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

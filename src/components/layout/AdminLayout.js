@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -140,7 +140,7 @@ const AdminLayout = ({ children }) => {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-4 sm:p-6">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

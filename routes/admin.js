@@ -1,9 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../database');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Admin authorization middleware
+const requireAdmin = async (req, res, next) => {
+  try {
+    // Check if user exists and has admin role
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Admin authorization error:', error);
+    return res.status(500).json({ error: 'Authorization check failed' });
+  }
+};
 
 // Get system statistics
-router.get('/stats', async (req, res) => {
+router.get('/stats', requireAdmin, async (req, res) => {
   try {
     const connection = await pool.getConnection();
     
@@ -73,7 +95,7 @@ router.get('/stats', async (req, res) => {
 });
 
 // Get user activity data
-router.get('/user-activity', async (req, res) => {
+router.get('/user-activity', requireAdmin, async (req, res) => {
   try {
     const connection = await pool.getConnection();
     
@@ -129,7 +151,7 @@ router.get('/user-activity', async (req, res) => {
 });
 
 // Get AI model performance data
-router.get('/model-performance', async (req, res) => {
+router.get('/model-performance', requireAdmin, async (req, res) => {
   try {
     const connection = await pool.getConnection();
     
@@ -190,7 +212,7 @@ router.get('/model-performance', async (req, res) => {
 });
 
 // Get system alerts
-router.get('/alerts', async (req, res) => {
+router.get('/alerts', requireAdmin, async (req, res) => {
   try {
     // Mock system alerts - in real app, these would come from monitoring system
     const alerts = [
@@ -257,4 +279,4 @@ router.get('/recent-users', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

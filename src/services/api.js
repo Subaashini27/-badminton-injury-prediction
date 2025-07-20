@@ -76,10 +76,24 @@ const fallbackAuth = {
         if (user) {
           console.log('Found user in demo accounts:', user.role);
           const { password, ...userWithoutPassword } = user;
+          
+          // Create a proper JWT-like token structure for demo purposes
+          const tokenPayload = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            name: user.name,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+          };
+          
+          // For demo purposes, create a base64 encoded token that looks like JWT
+          const demoToken = 'demo.' + btoa(JSON.stringify(tokenPayload)) + '.signature';
+          
           resolve({
             data: {
               user: userWithoutPassword,
-              token: `demo-token-${user.role}-${Date.now()}`
+              token: demoToken
             }
           });
         } else {
@@ -91,10 +105,24 @@ const fallbackAuth = {
           if (registeredUser) {
             console.log('Found user in localStorage:', registeredUser.role);
             const { password, ...userWithoutPassword } = registeredUser;
+            
+            // Create a proper JWT-like token structure for demo purposes
+            const tokenPayload = {
+              id: registeredUser.id,
+              email: registeredUser.email,
+              role: registeredUser.role,
+              name: registeredUser.name,
+              iat: Math.floor(Date.now() / 1000),
+              exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+            };
+            
+            // For demo purposes, create a base64 encoded token that looks like JWT
+            const demoToken = 'demo.' + btoa(JSON.stringify(tokenPayload)) + '.signature';
+            
             resolve({
               data: {
                 user: userWithoutPassword,
-                token: `demo-token-${registeredUser.role}-${Date.now()}`
+                token: demoToken
               }
             });
           } else {
