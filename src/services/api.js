@@ -68,10 +68,13 @@ const fallbackAuth = {
   login: async (email, password) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
+        console.log('Fallback auth checking for:', email);
+        
         // Check demo accounts
         const user = DEMO_ACCOUNTS.find(acc => acc.email === email && acc.password === password);
         
         if (user) {
+          console.log('Found user in demo accounts:', user.role);
           const { password, ...userWithoutPassword } = user;
           resolve({
             data: {
@@ -80,19 +83,22 @@ const fallbackAuth = {
             }
           });
         } else {
+          console.log('User not found in demo accounts, checking localStorage');
           // Check localStorage for registered users
           const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
           const registeredUser = registeredUsers.find(u => u.email === email && u.password === password);
           
           if (registeredUser) {
+            console.log('Found user in localStorage:', registeredUser.role);
             const { password, ...userWithoutPassword } = registeredUser;
-        resolve({
-          data: {
+            resolve({
+              data: {
                 user: userWithoutPassword,
                 token: `demo-token-${registeredUser.role}-${Date.now()}`
               }
             });
           } else {
+            console.log('User not found anywhere');
             reject(new Error('Invalid email or password'));
           }
         }
@@ -152,7 +158,8 @@ const apiService = {
         const response = await api.post('/api/auth/login', { email, password });
         return response;
       } catch (error) {
-        // Backend unavailable, using fallback authentication
+        // If we get a 401 error or any other error, use fallback authentication
+        console.log('Backend authentication failed, using fallback for:', email);
         return fallbackAuth.login(email, password);
       }
     },
