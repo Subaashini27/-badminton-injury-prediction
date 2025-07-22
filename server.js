@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const { initializeDatabase, pool } = require('./database');
+const { initializeDatabase, query, isConnected } = require('./database-fallback');
 const authRoutes = require('./routes/auth');
 const coachRoutes = require('./routes/coaches');
 const athleteRoutes = require('./routes/athletes');
@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'http://localhost:3001',
     'https://badminton-injury.live',
     'https://www.badminton-injury.live',
     'https://courageous-sundae-6c35ce.netlify.app'
@@ -42,22 +43,6 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  // Handle demo tokens for fallback authentication
-  if (token.startsWith('demo.')) {
-    try {
-      const parts = token.split('.');
-      if (parts.length === 3) {
-        const payload = JSON.parse(atob(parts[1]));
-        req.user = payload;
-        return next();
-      }
-    } catch (error) {
-      console.error('Error parsing demo token:', error);
-      return res.status(403).json({ error: 'Invalid demo token' });
-    }
-  }
-
-  // Handle regular JWT tokens
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       return res.status(403).json({ error: 'Invalid token' });
