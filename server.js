@@ -20,6 +20,7 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://localhost:5001',
     'https://badminton-injury.live',
     'https://www.badminton-injury.live',
     'https://courageous-sundae-6c35ce.netlify.app'
