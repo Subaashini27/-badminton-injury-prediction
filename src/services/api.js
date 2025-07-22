@@ -13,7 +13,7 @@ const getApiBaseUrl = () => {
     }
   }
   // Fallback URL
-  return 'https://vivacious-tenderness-production.up.railway.app/api';
+  return 'https://vivacious-tenderness-production.up.railway.app';
 };
 
 const API_BASE_URL = getApiBaseUrl();

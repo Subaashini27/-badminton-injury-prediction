@@ -11,6 +11,7 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  connectTimeout: 30000, // 30 seconds
   // SSL configuration for cloud databases
   ssl: process.env.NODE_ENV === 'production' ? { 
     rejectUnauthorized: false
