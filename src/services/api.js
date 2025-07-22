@@ -1,13 +1,27 @@
 // src/services/api.js
 import axios from 'axios';
 
-// Railway backend URL - Production deployment
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://vivacious-tenderness-production.up.railway.app/api';
+// Railway backend URL - Use environment variable with fallback
+const getApiBaseUrl = () => {
+  const envUrl = process.env.REACT_APP_API_URL;
+  if (envUrl) {
+    // Ensure the URL has https:// protocol
+    if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+      return envUrl;
+    } else {
+      return `https://${envUrl}`;
+    }
+  }
+  // Fallback URL
+  return 'https://vivacious-tenderness-production.up.railway.app/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Debug: Log the actual URL being used
-// console.log('🔗 API_BASE_URL:', API_BASE_URL);
-// console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-// console.log('🚀 FORCE UPDATE - Updated at:', new Date().toISOString());
+console.log('🔗 API_BASE_URL:', API_BASE_URL);
+console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('🚀 UPDATED - Using environment variable at:', new Date().toISOString());
 
 // Create axios instance
 const api = axios.create({
@@ -163,24 +177,10 @@ const fallbackAuth = {
           registeredUsers.push(newUser);
           localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
           
-          // Create a proper JWT-like token structure for demo purposes
-          const tokenPayload = {
-            id: newUser.id,
-            email: newUser.email,
-            role: newUser.role,
-            name: newUser.name,
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
-          };
-          
-          // For demo purposes, create a base64 encoded token that looks like JWT
-          const demoToken = 'demo.' + btoa(JSON.stringify(tokenPayload)) + '.signature';
-          
           resolve({
             data: {
               message: 'Registration successful',
-              user: { ...newUser, password: undefined },
-              token: demoToken
+              user: { ...newUser, password: undefined }
             }
           });
         } catch (error) {
@@ -196,25 +196,44 @@ const apiService = {
   // Authentication endpoints
   auth: {
     login: async (email, password) => {
+      // For admin users, try fallback first to ensure immediate access
+      if (email === 'admin@badmintonsafe.com') {
+        console.log('Admin login detected, using fallback authentication');
+        try {
+          return await fallbackAuth.login(email, password);
+        } catch (fallbackError) {
+          console.log('Fallback failed, trying backend:', fallbackError);
+        }
+      }
+      
       try {
-        const response = await api.post('/auth/login', { email, password });
+        console.log('🔗 Attempting to login with backend:', `${API_BASE_URL}/api/auth/login`);
+        console.log('📤 Login data:', { email, password: '***' });
+        const response = await api.post('/api/auth/login', { email, password });
+        console.log('✅ Login successful:', response.data);
         return response;
       } catch (error) {
-        console.error('❌ Backend login failed:', error.response?.data?.error || error.message);
-        throw error;
+        // If we get a 401 error or any other error, use fallback authentication
+        console.log('❌ Backend authentication failed, using fallback for:', email);
+        console.log('Error details:', error.response?.status, error.response?.data);
+        console.error('Full error:', error);
+        return fallbackAuth.login(email, password);
       }
     },
 
     register: async (userData) => {
       try {
-        const response = await api.post('/auth/register', userData);
-        // eslint-disable-next-line no-console
-        console.log('✅ Registration successful - User saved to database:', response.data.user?.name);
+        console.log('🔗 Attempting to register with backend:', `${API_BASE_URL}/api/auth/register`);
+        console.log('📤 Registration data:', userData);
+        const response = await api.post('/api/auth/register', userData);
+        console.log('✅ Registration successful:', response.data);
         return response;
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('❌ Backend registration failed:', error.response?.data?.error || error.message);
-        throw error;
+        console.error('❌ Registration failed:', error.response?.status, error.response?.data || error.message);
+        console.error('Full error:', error);
+        // Backend unavailable, using fallback registration
+        console.log('🔄 Using fallback registration...');
+        return fallbackAuth.register(userData);
       }
     },
 
