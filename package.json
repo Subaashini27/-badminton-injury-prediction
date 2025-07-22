@@ -40,6 +40,7 @@
     "react-router-dom": "^6.20.0",
     "react-scripts": "^5.0.1",
     "react-toastify": "^11.0.5",
+    "serve": "^14.2.1",
     "sqlite3": "^5.1.7",
     "web-vitals": "^2.1.4"
   },
