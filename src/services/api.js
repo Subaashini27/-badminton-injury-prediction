@@ -25,7 +25,7 @@ console.log('🚀 UPDATED - Using environment variable at:', new Date().toISOStr
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL + '/api',
   timeout: 10000, // 10 seconds timeout
   headers: {
     'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ const apiService = {
       try {
         console.log('🔗 Attempting to login with backend:', `${API_BASE_URL}/api/auth/login`);
         console.log('📤 Login data:', { email, password: '***' });
-        const response = await api.post('/api/auth/login', { email, password });
+        const response = await api.post('/auth/login', { email, password });
         console.log('✅ Login successful:', response.data);
         return response;
       } catch (error) {
@@ -225,7 +225,7 @@ const apiService = {
       try {
         console.log('🔗 Attempting to register with backend:', `${API_BASE_URL}/api/auth/register`);
         console.log('📤 Registration data:', userData);
-        const response = await api.post('/api/auth/register', userData);
+        const response = await api.post('/auth/register', userData);
         console.log('✅ Registration successful:', response.data);
         return response;
       } catch (error) {
@@ -239,7 +239,7 @@ const apiService = {
 
     forgotPassword: async (email) => {
       try {
-        const response = await api.post('/api/auth/forgot-password', { email });
+        const response = await api.post('/auth/forgot-password', { email });
         return response;
       } catch (error) {
         // Fallback for forgot password
@@ -255,7 +255,7 @@ const apiService = {
   // Health check
   health: async () => {
     try {
-      const response = await api.get('/api/health');
+      const response = await api.get('/health');
       return response;
     } catch (error) {
       return {
@@ -282,7 +282,7 @@ api.interceptors.request.use((config) => {
 export const athleteAPI = {
   saveAnalysisData: async (analysisData) => {
     try {
-      const response = await api.post('/api/athletes/analysis', analysisData);
+      const response = await api.post('/athletes/analysis', analysisData);
       return response;
     } catch (error) {
       // Fallback to localStorage - saving analysis data locally
@@ -295,7 +295,7 @@ export const athleteAPI = {
 
   getAnalysisHistory: async (athleteId) => {
     try {
-      const response = await api.get(`/api/athletes/${athleteId}/analysis`);
+      const response = await api.get(`/athletes/${athleteId}/analysis`);
       return response;
     } catch (error) {
       // Fallback to localStorage - using local analysis history
@@ -308,7 +308,7 @@ export const athleteAPI = {
 export const coachAPI = {
   getTrainingPlans: async (coachId) => {
     try {
-      const response = await api.get(`/api/coaches/${coachId}/training-plans`);
+      const response = await api.get(`/coaches/${coachId}/training-plans`);
       return response;
     } catch (error) {
       // Fallback to localStorage - using local training plans
@@ -318,7 +318,7 @@ export const coachAPI = {
 
   getAthletes: async (coachId) => {
     try {
-      const response = await api.get(`/api/coaches/${coachId}/athletes`);
+      const response = await api.get(`/coaches/${coachId}/athletes`);
       return response;
     } catch (error) {
       // Fallback to localStorage - using local athletes data
@@ -328,7 +328,7 @@ export const coachAPI = {
 
   createTrainingPlan: async (coachId, planData) => {
     try {
-      const response = await api.post(`/api/coaches/${coachId}/training-plans`, planData);
+      const response = await api.post(`/coaches/${coachId}/training-plans`, planData);
       return response;
     } catch (error) {
       // Fallback to localStorage - saving training plan locally
@@ -338,7 +338,7 @@ export const coachAPI = {
 
   getInjuryReports: async (coachId) => {
     try {
-      const response = await api.get(`/api/coaches/${coachId}/injury-reports`);
+      const response = await api.get(`/coaches/${coachId}/injury-reports`);
       return response;
     } catch (error) {
       // Fallback to localStorage - using local injury reports
@@ -348,7 +348,7 @@ export const coachAPI = {
 
   addAthlete: async (coachId, athleteData) => {
     try {
-      const response = await api.post(`/api/coaches/${coachId}/athletes`, athleteData);
+      const response = await api.post(`/coaches/${coachId}/athletes`, athleteData);
       return response;
     } catch (error) {
       // Fallback to localStorage - saving athlete locally
