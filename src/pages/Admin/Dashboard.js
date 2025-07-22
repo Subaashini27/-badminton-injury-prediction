@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
-import { useNavigate } from 'react-router-dom';
 
-const AdminDashboard = () => {
+const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dashboardStats, setDashboardStats] = useState({
     totalUsers: 0,
