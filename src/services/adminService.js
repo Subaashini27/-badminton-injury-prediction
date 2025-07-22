@@ -84,12 +84,9 @@ export const adminService = {
   // Get system statistics
   async getSystemStats() {
     try {
-      console.log('🔗 Attempting to fetch system stats from backend');
       const response = await api.get('/api/admin/stats');
-      console.log('✅ System stats fetched from backend:', response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, using mock system stats:', error.message);
       return mockSystemStats;
     }
   },
@@ -97,12 +94,9 @@ export const adminService = {
   // Get user activity data
   async getUserActivity() {
     try {
-      console.log('🔗 Attempting to fetch user activity from backend');
       const response = await api.get('/api/admin/user-activity');
-      console.log('✅ User activity fetched from backend:', response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, using mock user activity:', error.message);
       return mockUserActivity;
     }
   },
@@ -110,12 +104,9 @@ export const adminService = {
   // Get AI model performance
   async getModelPerformance() {
     try {
-      console.log('🔗 Attempting to fetch model performance from backend');
       const response = await api.get('/api/admin/model-performance');
-      console.log('✅ Model performance fetched from backend:', response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, using mock model performance:', error.message);
       return mockModelPerformance;
     }
   },
@@ -123,12 +114,9 @@ export const adminService = {
   // Get system alerts
   async getSystemAlerts() {
     try {
-      console.log('🔗 Attempting to fetch system alerts from backend');
       const response = await api.get('/api/admin/alerts');
-      console.log('✅ System alerts fetched from backend:', response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, using mock system alerts:', error.message);
       return mockSystemAlerts;
     }
   },
@@ -136,12 +124,9 @@ export const adminService = {
   // Get recent users
   async getRecentUsers() {
     try {
-      console.log('🔗 Attempting to fetch recent users from backend');
       const response = await api.get('/api/admin/recent-users');
-      console.log('✅ Recent users fetched from backend:', response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, using mock recent users:', error.message);
       return mockSystemStats.recentUsers;
     }
   },
@@ -149,12 +134,9 @@ export const adminService = {
   // Get all users for user management
   async getAllUsers() {
     try {
-      console.log('🔗 Attempting to fetch all users from backend');
       const response = await api.get('/api/admin/users');
-      console.log('✅ All users fetched from backend:', response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, using mock all users:', error.message);
       return mockAllUsers;
     }
   },
@@ -165,8 +147,6 @@ export const adminService = {
       const response = await api.post('/admin/create-admin', userData);
       return response.data;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error creating admin:', error);
       throw error;
     }
   },
@@ -177,8 +157,6 @@ export const adminService = {
       const response = await api.put(`/admin/users/${userId}/status`, { status });
       return response.data;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error updating user status:', error);
       throw error;
     }
   },
@@ -189,8 +167,6 @@ export const adminService = {
       const response = await api.delete(`/admin/users/${userId}`);
       return response.data;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error deleting user:', error);
       throw error;
     }
   }

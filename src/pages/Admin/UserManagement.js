@@ -17,7 +17,7 @@ const UserManagement = () => {
     password: '',
     confirmPassword: ''
   });
-  const [createAdminError, setCreateAdminError] = useState('');
+  const [createAdminError] = useState('');
 
   useEffect(() => {
     loadUsers();
@@ -75,7 +75,6 @@ const UserManagement = () => {
       setUsers(transformedUsers);
       setFilteredUsers(transformedUsers);
     } catch (error) {
-      console.error('Error loading users:', error);
       // Fallback to empty array on error
       setUsers([]);
       setFilteredUsers([]);

@@ -3,8 +3,8 @@ import { adminService } from '../../services/adminService';
 
 const SystemLogs = () => {
   const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setLoading] = useState(true);
+  const [, setError] = useState(null);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -14,7 +14,6 @@ const SystemLogs = () => {
         setLogs(logsData);
         setError(null);
       } catch (err) {
-        console.error('Error fetching system logs:', err);
         setError('Failed to load system logs');
         // Fallback to empty array if API fails
         setLogs([]);

@@ -18,10 +18,7 @@ const getApiBaseUrl = () => {
 
 const API_BASE_URL = getApiBaseUrl();
 
-// Debug: Log the actual URL being used
-console.log('🔗 API_BASE_URL:', API_BASE_URL);
-console.log('🔗 Environment variable REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-console.log('🚀 UPDATED - Using environment variable at:', new Date().toISOString());
+
 
 // Create axios instance
 const api = axios.create({
@@ -82,13 +79,10 @@ const fallbackAuth = {
   login: async (email, password) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log('Fallback auth checking for:', email);
-        
         // Check demo accounts
         const user = DEMO_ACCOUNTS.find(acc => acc.email === email && acc.password === password);
         
         if (user) {
-          console.log('Found user in demo accounts:', user.role);
           const { password, ...userWithoutPassword } = user;
           
           // Create a proper JWT-like token structure for demo purposes
@@ -111,13 +105,11 @@ const fallbackAuth = {
             }
           });
         } else {
-          console.log('User not found in demo accounts, checking localStorage');
           // Check localStorage for registered users
           const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
           const registeredUser = registeredUsers.find(u => u.email === email && u.password === password);
           
           if (registeredUser) {
-            console.log('Found user in localStorage:', registeredUser.role);
             const { password, ...userWithoutPassword } = registeredUser;
             
             // Create a proper JWT-like token structure for demo purposes
@@ -140,7 +132,6 @@ const fallbackAuth = {
               }
             });
           } else {
-            console.log('User not found anywhere');
             reject(new Error('Invalid email or password'));
           }
         }
@@ -198,41 +189,27 @@ const apiService = {
     login: async (email, password) => {
       // For admin users, try fallback first to ensure immediate access
       if (email === 'admin@badmintonsafe.com') {
-        console.log('Admin login detected, using fallback authentication');
         try {
           return await fallbackAuth.login(email, password);
         } catch (fallbackError) {
-          console.log('Fallback failed, trying backend:', fallbackError);
         }
       }
       
       try {
-        console.log('🔗 Attempting to login with backend:', `${API_BASE_URL}/api/auth/login`);
-        console.log('📤 Login data:', { email, password: '***' });
         const response = await api.post('/auth/login', { email, password });
-        console.log('✅ Login successful:', response.data);
         return response;
       } catch (error) {
         // If we get a 401 error or any other error, use fallback authentication
-        console.log('❌ Backend authentication failed, using fallback for:', email);
-        console.log('Error details:', error.response?.status, error.response?.data);
-        console.error('Full error:', error);
         return fallbackAuth.login(email, password);
       }
     },
 
     register: async (userData) => {
       try {
-        console.log('🔗 Attempting to register with backend:', `${API_BASE_URL}/api/auth/register`);
-        console.log('📤 Registration data:', userData);
         const response = await api.post('/auth/register', userData);
-        console.log('✅ Registration successful:', response.data);
         return response;
       } catch (error) {
-        console.error('❌ Registration failed:', error.response?.status, error.response?.data || error.message);
-        console.error('Full error:', error);
         // Backend unavailable, using fallback registration
-        console.log('🔄 Using fallback registration...');
         return fallbackAuth.register(userData);
       }
     },

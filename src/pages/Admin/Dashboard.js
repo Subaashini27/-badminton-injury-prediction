@@ -33,7 +33,7 @@ const AdminDashboard = () => {
       setDashboardStats(stats);
       setSystemAlerts(alerts);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      // Handle or log error appropriately
     } finally {
       setIsLoading(false);
     }
@@ -49,30 +49,11 @@ const AdminDashboard = () => {
       );
       // You can add API call here to update alert status on backend
     } catch (error) {
-      console.error('Error resolving alert:', error);
+      // Handle or log error appropriately
     }
   };
 
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
 
-  const handleAction = async (action) => {
-    try {
-      switch (action) {
-        case 'backup':
-          alert('Database backup initiated. You will be notified when complete.');
-          break;
-        case 'export':
-          alert('User data export started. Download will begin shortly.');
-          break;
-        default:
-          console.log(`Action: ${action}`);
-      }
-    } catch (error) {
-      console.error('Error performing action:', error);
-    }
-  };
 
   if (isLoading) {
     return (
