@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import { adminService } from '../../services/adminService';
 
 const SystemLogs = () => {
   const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Demo/mock data
-    setLogs([
-      { timestamp: '2024-07-13 20:00', user: 'admin@badmintonsafe.com', action: 'Logged in', status: 'Success' },
-      { timestamp: '2024-07-13 20:01', user: 'admin@badmintonsafe.com', action: 'Viewed User Management', status: 'Success' },
-      { timestamp: '2024-07-13 20:02', user: 'admin@badmintonsafe.com', action: 'Created new admin', status: 'Success' },
-      { timestamp: '2024-07-13 20:05', user: 'coach@example.com', action: 'Logged in', status: 'Success' },
-      { timestamp: '2024-07-13 20:06', user: 'coach@example.com', action: 'Viewed Athlete List', status: 'Success' },
-      { timestamp: '2024-07-13 20:10', user: 'athlete@example.com', action: 'Logged in', status: 'Success' },
-      { timestamp: '2024-07-13 20:12', user: 'athlete@example.com', action: 'Submitted Injury Report', status: 'Success' },
-      { timestamp: '2024-07-13 20:15', user: 'admin@badmintonsafe.com', action: 'Exported User Data', status: 'Success' },
-      { timestamp: '2024-07-13 20:20', user: 'admin@badmintonsafe.com', action: 'Logged out', status: 'Success' },
-    ]);
+    const fetchLogs = async () => {
+      try {
+        setLoading(true);
+        const logsData = await adminService.getSystemLogs();
+        setLogs(logsData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching system logs:', err);
+        setError('Failed to load system logs');
+        // Fallback to empty array if API fails
+        setLogs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLogs();
   }, []);
 
   return (

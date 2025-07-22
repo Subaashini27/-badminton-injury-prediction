@@ -95,7 +95,7 @@ router.get('/stats', requireAdmin, async (req, res) => {
 });
 
 // Get user activity data
-router.get('/user-activity', requireAdmin, async (req, res) => {
+router.get('/user-activity', async (req, res) => {
   try {
     const connection = await pool.getConnection();
     
@@ -151,7 +151,7 @@ router.get('/user-activity', requireAdmin, async (req, res) => {
 });
 
 // Get AI model performance data
-router.get('/model-performance', requireAdmin, async (req, res) => {
+router.get('/model-performance', async (req, res) => {
   try {
     const connection = await pool.getConnection();
     
@@ -212,7 +212,7 @@ router.get('/model-performance', requireAdmin, async (req, res) => {
 });
 
 // Get system alerts
-router.get('/alerts', requireAdmin, async (req, res) => {
+router.get('/alerts', async (req, res) => {
   try {
     // Mock system alerts - in real app, these would come from monitoring system
     const alerts = [

@@ -210,12 +210,95 @@ async function initializeDatabase() {
   try {
     const connection = await pool.getConnection();
     
-    // Create database if it doesn't exist
-    await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`);
-    await connection.execute(`USE ${dbConfig.database}`);
+    // Create database if it doesn't exist (Railway already provides the database)
+    // await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`);
+    // await connection.execute(`USE ${dbConfig.database}`);
     
-    // Create tables (same as original database.js)
-    // ... (table creation code would go here)
+    // Create users table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role ENUM('coach', 'athlete', 'admin') DEFAULT 'athlete',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create athletes table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS athletes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        coach_id INT,
+        age INT,
+        experience VARCHAR(100),
+        level ENUM('beginner', 'intermediate', 'advanced') DEFAULT 'beginner',
+        training_plan VARCHAR(255),
+        last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (coach_id) REFERENCES users(id) ON DELETE SET NULL
+      )
+    `);
+
+    // Create coaches table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS coaches (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Create analysis_data table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS analysis_data (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        athlete_id INT NOT NULL,
+        knee_risk DECIMAL(5,4) DEFAULT 0,
+        hip_risk DECIMAL(5,4) DEFAULT 0,
+        shoulder_risk DECIMAL(5,4) DEFAULT 0,
+        back_risk DECIMAL(5,4) DEFAULT 0,
+        overall_risk DECIMAL(5,4) DEFAULT 0,
+        smash_power DECIMAL(5, 2) DEFAULT 0,
+        clear_height DECIMAL(5, 2) DEFAULT 0,
+        drop_shot_precision DECIMAL(5, 2) DEFAULT 0,
+        net_shot_accuracy DECIMAL(5, 2) DEFAULT 0,
+        court_coverage DECIMAL(5, 2) DEFAULT 0,
+        recovery_speed DECIMAL(5, 2) DEFAULT 0,
+        footwork_efficiency DECIMAL(5, 2) DEFAULT 0,
+        reaction_time DECIMAL(5, 2) DEFAULT 0,
+        stamina DECIMAL(5, 2) DEFAULT 0,
+        agility DECIMAL(5, 2) DEFAULT 0,
+        strength DECIMAL(5, 2) DEFAULT 0,
+        flexibility DECIMAL(5, 2) DEFAULT 0,
+        racket_control DECIMAL(5, 2) DEFAULT 0,
+        stroke_precision DECIMAL(5, 2) DEFAULT 0,
+        tactical_awareness DECIMAL(5, 2) DEFAULT 0,
+        consistency DECIMAL(5, 2) DEFAULT 0,
+        overall_score DECIMAL(5, 2) DEFAULT 0,
+        analysis_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        session_duration INT DEFAULT 0,
+        notes TEXT,
+        FOREIGN KEY (athlete_id) REFERENCES athletes(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Create feedback table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS feedback (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        coach_id INT NOT NULL,
+        athlete_id INT NOT NULL,
+        message TEXT NOT NULL,
+        priority ENUM('Low', 'Medium', 'High') NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (coach_id) REFERENCES coaches(id) ON DELETE CASCADE,
+        FOREIGN KEY (athlete_id) REFERENCES athletes(id) ON DELETE CASCADE
+      )
+    `);
     
     connection.release();
     console.log('✅ Database initialized successfully');

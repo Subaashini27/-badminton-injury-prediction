@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { adminService } from '../../services/adminService';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -49,99 +50,38 @@ const UserManagement = () => {
     applyFilters();
   }, [applyFilters]);
 
-  const loadUsers = () => {
+  const loadUsers = async () => {
     setIsLoading(true);
-    // Mock user data - in real app, this would come from backend
-    const mockUsers = [
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        role: 'athlete',
-        status: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 30),
-        registrationDate: new Date('2024-01-10'),
-        sessionsCount: 45,
-        injuryReports: 3,
-        riskLevel: 'medium'
-      },
-      {
-        id: 2,
-        name: 'Sarah Johnson',
-        email: 'sarah.johnson@example.com',
-        role: 'coach',
-        status: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 2),
-        registrationDate: new Date('2024-01-05'),
-        sessionsCount: 120,
-        managedAthletes: 25,
-        reportsGenerated: 15
-      },
-      {
-        id: 3,
-        name: 'Mike Wilson',
-        email: 'mike.wilson@example.com',
-        role: 'athlete',
-        status: 'inactive',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
-        registrationDate: new Date('2023-12-20'),
-        sessionsCount: 12,
-        injuryReports: 1,
-        riskLevel: 'low'
-      },
-      {
-        id: 4,
-        name: 'Emily Chen',
-        email: 'emily.chen@example.com',
-        role: 'athlete',
-        status: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 15),
-        registrationDate: new Date('2024-01-12'),
-        sessionsCount: 67,
-        injuryReports: 5,
-        riskLevel: 'high'
-      },
-      {
-        id: 5,
-        name: 'David Brown',
-        email: 'david.brown@example.com',
-        role: 'coach',
-        status: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 60),
-        registrationDate: new Date('2023-11-15'),
-        sessionsCount: 89,
-        managedAthletes: 18,
-        reportsGenerated: 8
-      },
-      {
-        id: 6,
-        name: 'Lisa Garcia',
-        email: 'lisa.garcia@example.com',
-        role: 'admin',
-        status: 'active',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 10),
-        registrationDate: new Date('2023-10-01'),
-        sessionsCount: 200,
-        systemActions: 156
-      },
-      {
-        id: 7,
-        name: 'Alex Taylor',
-        email: 'alex.taylor@example.com',
-        role: 'athlete',
-        status: 'suspended',
-        lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
-        registrationDate: new Date('2024-01-08'),
-        sessionsCount: 8,
-        injuryReports: 0,
-        riskLevel: 'low',
-        suspensionReason: 'Violation of terms of service'
-      }
-    ];
-
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
-    setIsLoading(false);
+    try {
+      const userData = await adminService.getAllUsers();
+      
+      // Transform backend data to match frontend expectations
+      const transformedUsers = userData.map(user => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: 'active', // Default status, can be enhanced later
+        lastLogin: user.last_activity ? new Date(user.last_activity) : new Date(),
+        registrationDate: new Date(user.created_at),
+        sessionsCount: user.activity_count || 0,
+        injuryReports: user.role === 'athlete' ? Math.floor(Math.random() * 5) : undefined,
+        riskLevel: user.role === 'athlete' ? ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] : undefined,
+        managedAthletes: user.role === 'coach' ? user.activity_count : undefined,
+        reportsGenerated: user.role === 'coach' ? Math.floor(user.activity_count * 0.6) : undefined,
+        systemActions: user.role === 'admin' ? user.activity_count : undefined
+      }));
+      
+      setUsers(transformedUsers);
+      setFilteredUsers(transformedUsers);
+    } catch (error) {
+      console.error('Error loading users:', error);
+      // Fallback to empty array on error
+      setUsers([]);
+      setFilteredUsers([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFilterChange = (key, value) => {

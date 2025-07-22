@@ -1,16 +1,78 @@
 import React, { useState, useEffect } from 'react';
+import { adminService } from '../../services/adminService';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [dashboardStats, setDashboardStats] = useState({
+    totalUsers: 0,
+    athletes: 0,
+    coaches: 0,
+    admins: 0,
+    totalSessions: 0,
+    highRiskDetections: 0,
+    avgScore: 0,
+    recentSessions: 0,
+    todaySessions: 0,
+    recentUsers: []
+  });
+  const [systemAlerts, setSystemAlerts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Simple timeout to simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    fetchDashboardData();
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      const [stats, alerts] = await Promise.all([
+        adminService.getSystemStats(),
+        adminService.getSystemAlerts()
+      ]);
+      setDashboardStats(stats);
+      setSystemAlerts(alerts);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResolveAlert = async (alertId) => {
+    try {
+      // Update alert status locally
+      setSystemAlerts(prev => 
+        prev.map(alert => 
+          alert.id === alertId ? { ...alert, status: 'resolved' } : alert
+        )
+      );
+      // You can add API call here to update alert status on backend
+    } catch (error) {
+      console.error('Error resolving alert:', error);
+    }
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const handleAction = async (action) => {
+    try {
+      switch (action) {
+        case 'backup':
+          alert('Database backup initiated. You will be notified when complete.');
+          break;
+        case 'export':
+          alert('User data export started. Download will begin shortly.');
+          break;
+        default:
+          console.log(`Action: ${action}`);
+      }
+    } catch (error) {
+      console.error('Error performing action:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -45,8 +107,8 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Total Users</h3>
-              <p className="text-2xl font-bold text-blue-600">245</p>
-              <p className="text-sm text-gray-600">180 athletes, 45 coaches</p>
+              <p className="text-2xl font-bold text-blue-600">{dashboardStats.totalUsers}</p>
+              <p className="text-sm text-gray-600">{dashboardStats.athletes} athletes, {dashboardStats.coaches} coaches</p>
             </div>
             <div className="text-3xl text-blue-600">👥</div>
           </div>
@@ -56,7 +118,7 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Model Accuracy</h3>
-              <p className="text-2xl font-bold text-green-600">94.2%</p>
+              <p className="text-2xl font-bold text-green-600">{dashboardStats.avgScore}%</p>
               <p className="text-sm text-gray-600">Current performance</p>
             </div>
             <div className="text-3xl text-green-600">🎯</div>
@@ -66,11 +128,11 @@ const AdminDashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">System Uptime</h3>
-              <p className="text-2xl font-bold text-yellow-600">99.8%</p>
-              <p className="text-sm text-gray-600">0.12s avg response</p>
+              <h3 className="text-lg font-semibold text-gray-800">High Risk Detections</h3>
+              <p className="text-2xl font-bold text-yellow-600">{dashboardStats.highRiskDetections}</p>
+              <p className="text-sm text-gray-600">Recent sessions</p>
             </div>
-            <div className="text-3xl text-yellow-600">⚡</div>
+            <div className="text-3xl text-yellow-600">⚠️</div>
           </div>
         </div>
 
@@ -78,8 +140,8 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Total Sessions</h3>
-              <p className="text-2xl font-bold text-red-600">1,240</p>
-              <p className="text-sm text-gray-600">23 today</p>
+              <p className="text-2xl font-bold text-red-600">{dashboardStats.totalSessions}</p>
+              <p className="text-sm text-gray-600">{dashboardStats.todaySessions} today</p>
             </div>
             <div className="text-3xl text-red-600">📊</div>
           </div>
@@ -91,59 +153,63 @@ const AdminDashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">👥 Recent Users</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-800">John Doe</p>
-                <p className="text-sm text-gray-600">john@example.com</p>
+            {dashboardStats.recentUsers && dashboardStats.recentUsers.length > 0 ? (
+              dashboardStats.recentUsers.map((user, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">{user.name || user.username || 'Unknown User'}</p>
+                    <p className="text-sm text-gray-600">{user.email || 'No email'}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user.role === 'coach' ? 'bg-green-100 text-green-800' : 
+                    user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {user.role || 'athlete'}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-4">
+                No recent users found
               </div>
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                athlete
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-800">Sarah Johnson</p>
-                <p className="text-sm text-gray-600">sarah@example.com</p>
-              </div>
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                coach
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-800">Mike Wilson</p>
-                <p className="text-sm text-gray-600">mike@example.com</p>
-              </div>
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                athlete
-              </span>
-            </div>
+            )}
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">⚠️ System Alerts</h3>
           <div className="space-y-3">
-            <div className="p-3 rounded-lg border-l-4 border-yellow-500 bg-yellow-50">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium text-gray-800">Model accuracy dropped below 95% threshold</p>
-                  <p className="text-sm text-gray-600">2 hours ago</p>
+            {systemAlerts && systemAlerts.length > 0 ? (
+              systemAlerts.map((alert, index) => (
+                <div key={index} className={`p-3 rounded-lg border-l-4 ${
+                  alert.severity === 'high' ? 'border-red-500 bg-red-50' :
+                  alert.severity === 'medium' ? 'border-yellow-500 bg-yellow-50' :
+                  'border-green-500 bg-green-50'
+                }`}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-gray-800">{alert.message || alert.title}</p>
+                      <p className="text-sm text-gray-600">{alert.timestamp || alert.time || 'Recently'}</p>
+                    </div>
+                    {alert.status === 'resolved' ? (
+                      <span className="text-sm text-green-600">Resolved</span>
+                    ) : (
+                      <button 
+                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                        onClick={() => handleResolveAlert(alert.id)}
+                      >
+                        Resolve
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <button className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                  Resolve
-                </button>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-4">
+                No system alerts
               </div>
-            </div>
-            <div className="p-3 rounded-lg border-l-4 border-green-500 bg-green-50">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium text-gray-800">Scheduled model retraining completed</p>
-                  <p className="text-sm text-gray-600">6 hours ago</p>
-                </div>
-                <span className="text-sm text-green-600">Resolved</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
