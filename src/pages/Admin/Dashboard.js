@@ -17,7 +17,6 @@ const AdminDashboard = () => {
     recentUsers: []
   });
   const [systemAlerts, setSystemAlerts] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
