@@ -168,10 +168,24 @@ const fallbackAuth = {
           registeredUsers.push(newUser);
           localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
           
+          // Create a proper JWT-like token structure for demo purposes
+          const tokenPayload = {
+            id: newUser.id,
+            email: newUser.email,
+            role: newUser.role,
+            name: newUser.name,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+          };
+          
+          // For demo purposes, create a base64 encoded token that looks like JWT
+          const demoToken = 'demo.' + btoa(JSON.stringify(tokenPayload)) + '.signature';
+          
           resolve({
             data: {
               message: 'Registration successful',
-              user: { ...newUser, password: undefined }
+              user: { ...newUser, password: undefined },
+              token: demoToken
             }
           });
         } catch (error) {
