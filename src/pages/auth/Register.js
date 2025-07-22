@@ -256,22 +256,6 @@ const Register = () => {
                 <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
               )}
               </div>
-              
-              <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <select
-                id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                >
-                  <option value="athlete">Athlete</option>
-                  <option value="coach">Coach</option>
-                </select>
-              </div>
               </div>
               
               <div>
