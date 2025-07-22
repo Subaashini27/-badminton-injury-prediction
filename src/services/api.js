@@ -205,7 +205,7 @@ const apiService = {
 
     register: async (userData) => {
       try {
-        const response = await api.post('/auth/register', userData);
+        const response = await api.post('/api/auth/register', userData);
         // eslint-disable-next-line no-console
         console.log('✅ Registration successful - User saved to database:', response.data.user?.name);
         return response;
