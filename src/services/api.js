@@ -196,40 +196,25 @@ const apiService = {
   // Authentication endpoints
   auth: {
     login: async (email, password) => {
-      // For admin users, try fallback first to ensure immediate access
-      if (email === 'admin@badmintonsafe.com') {
-        console.log('Admin login detected, using fallback authentication');
-        try {
-          return await fallbackAuth.login(email, password);
-        } catch (fallbackError) {
-          console.log('Fallback failed, trying backend:', fallbackError);
-        }
-      }
-      
       try {
-        const response = await api.post('/api/auth/login', { email, password });
+        const response = await api.post('/auth/login', { email, password });
         return response;
       } catch (error) {
-        // If we get a 401 error or any other error, use fallback authentication
-        console.log('Backend authentication failed, using fallback for:', email);
-        console.log('Error details:', error.response?.status, error.response?.data);
-        return fallbackAuth.login(email, password);
+        console.error('❌ Backend login failed:', error.response?.data?.error || error.message);
+        throw error;
       }
     },
 
     register: async (userData) => {
       try {
-        const response = await api.post('/api/auth/register', userData);
+        const response = await api.post('/auth/register', userData);
         // eslint-disable-next-line no-console
         console.log('✅ Registration successful - User saved to database:', response.data.user?.name);
         return response;
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('❌ Backend registration failed, using localStorage fallback:', error.response?.data?.error || error.message);
-        
-        // Use fallback registration for demo reliability
-        console.log('🔄 Using fallback registration to ensure demo works');
-        return fallbackAuth.register(userData);
+        console.error('❌ Backend registration failed:', error.response?.data?.error || error.message);
+        throw error;
       }
     },
 
