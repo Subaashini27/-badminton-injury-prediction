@@ -13,7 +13,7 @@ const getApiBaseUrl = () => {
     }
   }
   // Fallback URL
-  return 'https://vivacious-tenderness-production.up.railway.app';
+  return 'https://vivacious-tenderness-production.up.railway.app/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -25,7 +25,7 @@ console.log('🚀 UPDATED - Using environment variable at:', new Date().toISOStr
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL + '/api',
+  baseURL: API_BASE_URL,
   timeout: 10000, // 10 seconds timeout
   headers: {
     'Content-Type': 'application/json',
