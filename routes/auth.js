@@ -25,9 +25,12 @@ router.post('/register', async (req, res) => {
     }
     
     // SECURITY: Prevent admin role creation through public registration
+    console.log('Registration attempt with body:', req.body);
     if (role === 'admin') {
+      console.log('Admin registration blocked for email:', email);
       return res.status(403).json({ 
-        error: 'Admin accounts cannot be created through public registration. Please contact system administrator.' 
+        error: 'Admin accounts cannot be created through public registration. Please contact system administrator for assistance.',
+        code: 'ADMIN_REGISTRATION_FORBIDDEN'
       });
     }
     
