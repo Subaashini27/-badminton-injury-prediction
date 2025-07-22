@@ -49,10 +49,15 @@ router.post('/register', async (req, res) => {
     
     const userId = userResult.insertId;
     
-    // If registering as athlete, create athlete record
+    // If registering as athlete or coach, create corresponding record
     if (role === 'athlete') {
       await connection.execute(
         'INSERT INTO athletes (user_id) VALUES (?)',
+        [userId]
+      );
+    } else if (role === 'coach') {
+      await connection.execute(
+        'INSERT INTO coaches (user_id) VALUES (?)',
         [userId]
       );
     }
@@ -249,4 +254,4 @@ router.post('/create-admin', requireAdmin, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
