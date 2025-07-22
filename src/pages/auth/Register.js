@@ -130,9 +130,17 @@ const Register = () => {
     
     try {
       setLoading(true);
-      await register(formData);
-      success('Registration successful! Please log in.');
-      navigate('/login');
+      const user = await register(formData);
+      success(`Welcome ${user.name}! Registration successful.`);
+      
+      // Redirect based on user role
+      if (user.role === 'athlete') {
+        navigate('/athlete/dashboard');
+      } else if (user.role === 'coach') {
+        navigate('/coach/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       error(err.message || 'Registration failed');
     } finally {

@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Railway backend URL - Production deployment
-const API_BASE_URL = 'https://badminton-injury-backend-production.up.railway.app';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://vivacious-tenderness-production.up.railway.app/api';
 
 // Debug: Log the actual URL being used
 // console.log('🔗 API_BASE_URL:', API_BASE_URL);
@@ -205,16 +205,17 @@ const apiService = {
 
     register: async (userData) => {
       try {
-        // console.log('🔗 Attempting to register with backend:', `${API_BASE_URL}/api/auth/register`);
-        // console.log('📤 Registration data:', userData);
-        const response = await api.post('/api/auth/register', userData);
-        // console.log('✅ Registration successful:', response.data);
+        const response = await api.post('/auth/register', userData);
+        // eslint-disable-next-line no-console
+        console.log('✅ Registration successful - User saved to database:', response.data.user?.name);
         return response;
       } catch (error) {
-        // console.error('❌ Registration failed:', error.response?.status, error.response?.data || error.message);
-        // Backend unavailable, using fallback registration
-        // console.log('🔄 Using fallback registration...');
-        return fallbackAuth.register(userData);
+        // eslint-disable-next-line no-console
+        console.error('❌ Registration failed:', error.response?.data?.error || error.message);
+        
+        // Instead of fallback, throw the actual error so users know what went wrong
+        const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Registration failed. Please try again.';
+        throw new Error(errorMessage);
       }
     },
 
