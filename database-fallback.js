@@ -210,9 +210,9 @@ async function initializeDatabase() {
   try {
     const connection = await pool.getConnection();
     
-    // Create database if it doesn't exist (Railway already provides the database)
-    // await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`);
-    // await connection.execute(`USE ${dbConfig.database}`);
+    // Create database if it doesn't exist
+    await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`);
+    await connection.execute(`USE ${dbConfig.database}`);
     
     // Create users table
     await connection.execute(`

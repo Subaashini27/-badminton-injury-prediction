@@ -162,52 +162,36 @@ export const adminService = {
   // Create new admin user
   async createAdmin(userData) {
     try {
-      console.log('🔗 Attempting to create admin user via backend');
-      const response = await api.post('/api/admin/create-admin', userData);
-      console.log('✅ Admin user created via backend:', response.data);
+      const response = await api.post('/admin/create-admin', userData);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, simulating admin creation:', error.message);
-      // Simulate successful creation for demo purposes
-      return {
-        success: true,
-        message: 'Admin user created successfully (demo mode)',
-        user: { ...userData, id: Date.now(), password: undefined }
-      };
+      // eslint-disable-next-line no-console
+      console.error('Error creating admin:', error);
+      throw error;
     }
   },
 
   // Update user status
   async updateUserStatus(userId, status) {
     try {
-      console.log('🔗 Attempting to update user status via backend');
-      const response = await api.put(`/api/admin/users/${userId}/status`, { status });
-      console.log('✅ User status updated via backend:', response.data);
+      const response = await api.put(`/admin/users/${userId}/status`, { status });
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, simulating status update:', error.message);
-      // Simulate successful update for demo purposes
-      return {
-        success: true,
-        message: `User status updated to ${status} (demo mode)`
-      };
+      // eslint-disable-next-line no-console
+      console.error('Error updating user status:', error);
+      throw error;
     }
   },
 
   // Delete user
   async deleteUser(userId) {
     try {
-      console.log('🔗 Attempting to delete user via backend');
-      const response = await api.delete(`/api/admin/users/${userId}`);
-      console.log('✅ User deleted via backend:', response.data);
+      const response = await api.delete(`/admin/users/${userId}`);
       return response.data;
     } catch (error) {
-      console.log('❌ Backend failed, simulating user deletion:', error.message);
-      // Simulate successful deletion for demo purposes
-      return {
-        success: true,
-        message: 'User deleted successfully (demo mode)'
-      };
+      // eslint-disable-next-line no-console
+      console.error('Error deleting user:', error);
+      throw error;
     }
   }
 };

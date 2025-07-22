@@ -57,14 +57,6 @@ router.post('/register', async (req, res) => {
       );
     }
     
-    // If registering as coach, create coach record
-    if (role === 'coach') {
-      await connection.execute(
-        'INSERT INTO coaches (user_id) VALUES (?)',
-        [userId]
-      );
-    }
-    
     // Generate JWT token
     const token = jwt.sign({ id: userId, email, role }, JWT_SECRET, { expiresIn: '24h' });
     
@@ -257,4 +249,4 @@ router.post('/create-admin', requireAdmin, async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; 
