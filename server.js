@@ -52,13 +52,14 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Health check endpoint
+// Health check endpoint - must respond quickly for Railway
 app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    database: isConnected() ? 'connected' : 'fallback'
   });
 });
 
@@ -101,14 +102,17 @@ try {
   process.exit(1);
 }
 
-// Initialize database in background (non-blocking)
+// Initialize database in background (non-blocking with shorter delay)
 setTimeout(async () => {
   try {
     console.log('🔄 Initializing database in background...');
-    await initializeDatabase();
+    await Promise.race([
+      initializeDatabase(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Database init timeout')), 10000))
+    ]);
     console.log('✅ Database initialized successfully');
   } catch (error) {
     console.error('❌ Database initialization failed:', error.message);
-    console.log('⚠️  Server running without database initialization');
+    console.log('⚠️  Server running with fallback data only');
   }
-}, 1000);
+}, 100);
