@@ -175,6 +175,40 @@ const Register = () => {
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
               )}
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Role</label>
+                <div className="mt-2 flex items-center space-x-6">
+                  <div className="flex items-center">
+                    <input
+                      id="role-athlete"
+                      name="role"
+                      type="radio"
+                      value="athlete"
+                      checked={formData.role === 'athlete'}
+                      onChange={handleChange}
+                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                    />
+                    <label htmlFor="role-athlete" className="ml-3 block text-sm font-medium text-gray-700">
+                      Athlete
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      id="role-coach"
+                      name="role"
+                      type="radio"
+                      value="coach"
+                      checked={formData.role === 'coach'}
+                      onChange={handleChange}
+                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                    />
+                    <label htmlFor="role-coach" className="ml-3 block text-sm font-medium text-gray-700">
+                      Coach
+                    </label>
+                  </div>
+                </div>
+              </div>
               
               <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -257,21 +291,7 @@ const Register = () => {
               )}
               </div>
               
-              <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <select
-                id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                >
-                  <option value="athlete">Athlete</option>
-                  <option value="coach">Coach</option>
-                </select>
-              </div>
+
               </div>
               
               <div>
