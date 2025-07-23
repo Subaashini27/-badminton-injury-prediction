@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNotification } from '../../context/NotificationContext';
 
-const RiskNotificationBell = ({ jointAngles, isAnalyzing }) => {
-  const [notifications, setNotifications] = useState([]);
+const RiskNotificationBell = () => {
+  const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotification();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
-  const prevRisksRef = useRef({});
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -19,58 +18,18 @@ const RiskNotificationBell = ({ jointAngles, isAnalyzing }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Monitor for new risks
-  useEffect(() => {
-    if (!jointAngles || !isAnalyzing) return;
 
-    const currentRisks = {
-      shoulder: jointAngles.shoulderRisk,
-      elbow: jointAngles.elbowRisk,
-      hip: jointAngles.hipRisk,
-      knee: jointAngles.kneeRisk
-    };
-
-    const newNotifications = [];
-    const timestamp = new Date().toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-
-    // Check for new high risks
-    Object.entries(currentRisks).forEach(([joint, risk]) => {
-      if (risk === 'High Risk' && prevRisksRef.current[joint] !== 'High Risk') {
-        newNotifications.push({
-          id: Date.now() + Math.random(),
-          timestamp,
-          joint: joint.charAt(0).toUpperCase() + joint.slice(1),
-          risk: 'High Risk',
-          message: `High risk detected on ${joint}`,
-          read: false
-        });
-      }
-    });
-
-    if (newNotifications.length > 0) {
-      setNotifications(prev => [...newNotifications, ...prev].slice(0, 10)); // Keep last 10
-      setUnreadCount(prev => prev + newNotifications.length);
-    }
-
-    prevRisksRef.current = currentRisks;
-  }, [jointAngles, isAnalyzing]);
 
   const handleBellClick = () => {
     setShowDropdown(!showDropdown);
     if (!showDropdown) {
       // Mark all as read when opening
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      setUnreadCount(0);
+      markAllAsRead();
     }
   };
 
-  const clearNotifications = () => {
-    setNotifications([]);
-    setUnreadCount(0);
+  const handleClearAll = () => {
+    clearNotifications();
   };
 
   return (
@@ -110,7 +69,7 @@ const RiskNotificationBell = ({ jointAngles, isAnalyzing }) => {
               <h3 className="text-lg font-semibold text-gray-800">Risk Alerts</h3>
               {notifications.length > 0 && (
                 <button
-                  onClick={clearNotifications}
+                  onClick={handleClearAll}
                   className="text-xs text-gray-500 hover:text-gray-700"
                 >
                   Clear all
@@ -133,14 +92,14 @@ const RiskNotificationBell = ({ jointAngles, isAnalyzing }) => {
                   >
                     <div className="flex items-start">
                       <div className={`w-2 h-2 rounded-full mt-1.5 mr-3 ${
-                        notif.risk === 'High Risk' ? 'bg-red-500' : 'bg-amber-500'
+                        notif.type === 'warning' ? 'bg-red-500' : 'bg-blue-500'
                       }`}></div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-800">
                           {notif.message}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          🕒 {notif.timestamp}
+                          🕒 {new Date(notif.timestamp).toLocaleTimeString()}
                         </p>
                       </div>
                     </div>
@@ -163,4 +122,4 @@ const RiskNotificationBell = ({ jointAngles, isAnalyzing }) => {
   );
 };
 
-export default RiskNotificationBell; 
+export default RiskNotificationBell;
