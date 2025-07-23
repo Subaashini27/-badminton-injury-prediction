@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
+import RiskNotificationBell from './RiskNotificationBell';
 
 const Header = ({ setSidebarOpen }) => {
   const { currentUser } = useAuth();
@@ -21,6 +22,9 @@ const Header = ({ setSidebarOpen }) => {
       </div>
       
       <div className="flex items-center space-x-4">
+        {/* Notification Bell */}
+        <RiskNotificationBell />
+        
         <div className="flex items-center space-x-2">
            <FaUserCircle className="h-8 w-8 text-gray-400" />
            <div className="hidden md:block">

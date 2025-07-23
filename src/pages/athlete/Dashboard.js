@@ -112,13 +112,10 @@ const Dashboard = () => {
     
     // Trigger notification for high risk detection
     if (risk && risk.overall && risk.overall.level === 'high' && prevRiskLevelRef.current !== 'high') {
-      addNotification({
-        id: Date.now(),
-        title: 'High Risk Detected!',
-        message: `Overall injury risk is high. Consider adjusting your technique or taking a break.`,
-        type: 'warning',
-        timestamp: new Date().toISOString()
-      });
+      addNotification(
+        'High Risk Detected! Overall injury risk is high. Consider adjusting your technique or taking a break.',
+        'warning'
+      );
     }
     
     // Update previous risk level

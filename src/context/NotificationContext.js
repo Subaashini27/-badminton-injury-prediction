@@ -10,14 +10,15 @@ export const NotificationProvider = ({ children }) => {
       id: Date.now(),
       message,
       type,
-      timestamp: new Date()
+      timestamp: new Date(),
+      read: false
     };
     setNotifications((prev) => [...prev, notification]);
     
-    // Auto-remove notification after 5 seconds
+    // Auto-remove notification after 30 seconds for better visibility
     setTimeout(() => {
       setNotifications((prev) => prev.filter(n => n.id !== notification.id));
-    }, 5000);
+    }, 30000);
   }, []);
 
   const removeNotification = useCallback((id) => {
@@ -28,16 +29,24 @@ export const NotificationProvider = ({ children }) => {
     setNotifications([]);
   }, []);
 
+  const markAllAsRead = useCallback(() => {
+    setNotifications((prev) => prev.map(n => ({ ...n, read: true })));
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <NotificationContext.Provider value={{ 
       notifications, 
       addNotification, 
       removeNotification,
-      clearNotifications 
+      clearNotifications,
+      markAllAsRead,
+      unreadCount
     }}>
       {children}
     </NotificationContext.Provider>
   );
 };
 
-export const useNotification = () => useContext(NotificationContext); 
+export const useNotification = () => useContext(NotificationContext);
