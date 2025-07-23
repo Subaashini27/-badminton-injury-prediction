@@ -6,8 +6,10 @@ import MediaPipeLiveAnalysis from '../../components/live-analysis/MediaPipeLiveA
 import InjurySummary from '../../components/common/InjurySummary';
 import ExerciseRecommendations from '../../components/common/ExerciseRecommendations';
 import CoachFeedback from '../../components/athlete/CoachFeedback';
+import RiskNotificationBell from '../../components/common/RiskNotificationBell';
 import feedbackService from '../../services/feedbackService';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import { athleteAPI } from '../../services/api';
 import {
   Chart as ChartJS,
@@ -37,6 +39,7 @@ ChartJS.register(
 const Dashboard = () => {
   const [analysisMode, setAnalysisMode] = useState('stopped');
   const [jointAngles, setJointAngles] = useState(null);
+  const [riskData, setRiskData] = useState(null);
   const [poseDataHistory, setPoseDataHistory] = useState({
     shoulder: [],
     elbow: [],
@@ -49,7 +52,9 @@ const Dashboard = () => {
   const [feedbackError, setFeedbackError] = useState(null);
   
   const { currentUser } = useAuth();
+  const { addNotification } = useNotification();
   const sessionAnglesHistory = useRef([]);
+  const prevRiskLevelRef = useRef(null);
 
   // Fetch feedback data
   const fetchFeedback = useCallback(async () => {
@@ -103,8 +108,24 @@ const Dashboard = () => {
   }, [isRealTimeTracking, updatePoseHistory]);
 
   const handleRiskAnalysis = useCallback((risk) => {
-    // This function is no longer used as riskData state was removed
-  }, []);
+    setRiskData(risk);
+    
+    // Trigger notification for high risk detection
+    if (risk && risk.overall && risk.overall.level === 'high' && prevRiskLevelRef.current !== 'high') {
+      addNotification({
+        id: Date.now(),
+        title: 'High Risk Detected!',
+        message: `Overall injury risk is high. Consider adjusting your technique or taking a break.`,
+        type: 'warning',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Update previous risk level
+    if (risk && risk.overall) {
+      prevRiskLevelRef.current = risk.overall.level;
+    }
+  }, [addNotification]);
 
   // Calculate overall score from a set of metrics
   const calculateOverallScore = (metrics) => {
@@ -275,6 +296,15 @@ const Dashboard = () => {
       <main className="flex-1 overflow-y-auto">
         
         <div className="p-4 sm:p-6">
+          {/* Header with Notification Bell */}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Athlete Dashboard</h1>
+            <RiskNotificationBell 
+              jointAngles={jointAngles} 
+              isAnalyzing={analysisMode !== 'stopped'}
+            />
+          </div>
+          
           <div className="grid grid-cols-1 xl:grid-cols-[2.5fr_1fr] gap-4 sm:gap-6">
             {/* Live Analysis Section */}
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
