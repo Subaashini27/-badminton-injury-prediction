@@ -475,7 +475,7 @@ const MediaPipeLiveAnalysis = ({
       </div>
 
       {/* Control buttons */}
-      <div className="flex space-x-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4">
         <button
           onClick={startCamera}
           disabled={isLoading}
@@ -498,7 +498,7 @@ const MediaPipeLiveAnalysis = ({
           />
         </label>
         
-                <button
+        <button
           onClick={stopAnalysis}
           disabled={!isAnalyzing}
           className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
@@ -510,6 +510,8 @@ const MediaPipeLiveAnalysis = ({
           <span>⏹️</span>
           <span>Stop Analysis</span>
         </button>
+        
+
       </div>
 
       {/* Guidance Note */}
@@ -530,22 +532,22 @@ const MediaPipeLiveAnalysis = ({
             <p className="text-sm text-red-600">{error}</p>
             {/* Debug info */}
             <details className="mt-2">
-              <summary className="text-xs text-gray-500 cursor-pointer">Debug Info</summary>
-              <div className="text-xs text-gray-600 mt-1 font-mono">
-                <p>MediaPipe Ready: {poseRef.current ? 'Yes' : 'No'}</p>
-                <p>Video Element: {videoRef.current ? 'Yes' : 'No'}</p>
-                <p>Canvas Element: {canvasRef.current ? 'Yes' : 'No'}</p>
-                <p>Is Loading: {isLoading ? 'Yes' : 'No'}</p>
-                <p>Is Analyzing: {isAnalyzing ? 'Yes' : 'No'}</p>
-                <p>Current Mode: {currentMode || 'None'}</p>
-                {videoRef.current && (
-                  <>
-                    <p>Video Ready State: {videoRef.current.readyState}</p>
-                    <p>Video Dimensions: {videoRef.current.videoWidth}x{videoRef.current.videoHeight}</p>
-                    <p>Video Duration: {videoRef.current.duration}s</p>
-                  </>
-                )}
-              </div>
+                <summary className="text-xs text-gray-500 cursor-pointer">Quick Debug Info</summary>
+                <div className="text-xs text-gray-600 mt-1 font-mono">
+                  <p>MediaPipe Ready: {poseRef.current ? 'Yes' : 'No'}</p>
+                  <p>Video Element: {videoRef.current ? 'Yes' : 'No'}</p>
+                  <p>Canvas Element: {canvasRef.current ? 'Yes' : 'No'}</p>
+                  <p>Is Loading: {isLoading ? 'Yes' : 'No'}</p>
+                  <p>Is Analyzing: {isAnalyzing ? 'Yes' : 'No'}</p>
+                  <p>Current Mode: {currentMode || 'None'}</p>
+                  {videoRef.current && (
+                    <>
+                      <p>Video Ready State: {videoRef.current.readyState}</p>
+                      <p>Video Dimensions: {videoRef.current.videoWidth}x{videoRef.current.videoHeight}</p>
+                      <p>Video Duration: {videoRef.current.duration}s</p>
+                    </>
+                  )}
+                </div>
             </details>
           </div>
           <button
@@ -605,6 +607,8 @@ const MediaPipeLiveAnalysis = ({
           <span className="font-medium">⚠️ Analysis Accuracy Note:</span> Angle calculations are based on pose estimation and may vary based on lighting and camera angle. Use as supportive feedback for technique improvement.
         </p>
       </div>
+      
+
     </div>
   );
 };
