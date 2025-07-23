@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import RiskNotificationBell from '../notifications/RiskNotificationBell';
 
 const MainLayout = ({ children }) => {
   const { currentUser, logout } = useAuth();
@@ -42,6 +43,9 @@ const MainLayout = ({ children }) => {
 
             {currentUser && (
               <div className="flex items-center space-x-2 sm:space-x-4">
+                {currentUser.role === 'athlete' && (
+                  <RiskNotificationBell />
+                )}
                 <div className="hidden sm:flex items-center space-x-2 text-white text-sm">
                   <span>
                     {currentUser.role === 'athlete' ? 'Athlete: ' : 'Coach: '}
@@ -117,4 +121,4 @@ const MainLayout = ({ children }) => {
   );
 };
 
-export default MainLayout; 
+export default MainLayout;

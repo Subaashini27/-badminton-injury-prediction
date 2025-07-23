@@ -6,7 +6,7 @@ import MediaPipeLiveAnalysis from '../../components/live-analysis/MediaPipeLiveA
 import InjurySummary from '../../components/common/InjurySummary';
 import ExerciseRecommendations from '../../components/common/ExerciseRecommendations';
 import CoachFeedback from '../../components/athlete/CoachFeedback';
-import RiskNotificationBell from '../../components/common/RiskNotificationBell';
+
 import feedbackService from '../../services/feedbackService';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
@@ -296,13 +296,9 @@ const Dashboard = () => {
       <main className="flex-1 overflow-y-auto">
         
         <div className="p-4 sm:p-6">
-          {/* Header with Notification Bell */}
+          {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Athlete Dashboard</h1>
-            <RiskNotificationBell 
-              jointAngles={jointAngles} 
-              isAnalyzing={analysisMode !== 'stopped'}
-            />
           </div>
           
           <div className="grid grid-cols-1 xl:grid-cols-[2.5fr_1fr] gap-4 sm:gap-6">
