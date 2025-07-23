@@ -54,7 +54,6 @@ const SystemLogs = () => {
               </tbody>
             </table>
           </div>
-      <div className="mt-4 text-yellow-700 text-sm">⚠️ Demo data only. Connect to backend for real logs.</div>
     </div>
   );
 };

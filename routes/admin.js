@@ -279,4 +279,81 @@ router.get('/recent-users', async (req, res) => {
   }
 });
 
+// Get system logs
+router.get('/logs', requireAdmin, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    
+    // Get system logs from various sources
+    const logs = [];
+    
+    // Get user login activities
+    const [loginLogs] = await connection.execute(`
+      SELECT 
+        'User Login' as action,
+        u.name as user,
+        'Success' as status,
+        u.created_at as timestamp
+      FROM users u
+      ORDER BY u.created_at DESC
+      LIMIT 20
+    `);
+    
+    // Get analysis activities
+    const [analysisLogs] = await connection.execute(`
+      SELECT 
+        'Analysis Performed' as action,
+        u.name as user,
+        CASE WHEN a.overall_risk > 0.7 THEN 'High Risk' ELSE 'Success' END as status,
+        a.analysis_date as timestamp
+      FROM analysis_data a
+      JOIN users u ON a.athlete_id = u.id
+      ORDER BY a.analysis_date DESC
+      LIMIT 30
+    `);
+    
+    // Get feedback activities
+    const [feedbackLogs] = await connection.execute(`
+      SELECT 
+        'Feedback Sent' as action,
+        u.name as user,
+        'Success' as status,
+        f.created_at as timestamp
+      FROM feedback f
+      JOIN users u ON f.coach_id = u.id
+      ORDER BY f.created_at DESC
+      LIMIT 15
+    `);
+    
+    // Combine all logs
+    logs.push(...loginLogs.map(log => ({
+      ...log,
+      timestamp: log.timestamp.toISOString()
+    })));
+    
+    logs.push(...analysisLogs.map(log => ({
+      ...log,
+      timestamp: log.timestamp.toISOString()
+    })));
+    
+    logs.push(...feedbackLogs.map(log => ({
+      ...log,
+      timestamp: log.timestamp.toISOString()
+    })));
+    
+    // Sort by timestamp (most recent first)
+    logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    // Limit to 50 most recent logs
+    const recentLogs = logs.slice(0, 50);
+    
+    connection.release();
+    
+    res.json(recentLogs);
+  } catch (error) {
+    console.error('Error fetching system logs:', error);
+    res.status(500).json({ error: 'Failed to fetch system logs' });
+  }
+});
+
 module.exports = router;

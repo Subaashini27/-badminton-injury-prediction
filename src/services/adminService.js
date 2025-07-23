@@ -169,6 +169,18 @@ export const adminService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  // Get system logs
+  async getSystemLogs() {
+    try {
+      const response = await api.get('/api/admin/logs');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching system logs:', error);
+      // Return empty array if API fails
+      return [];
+    }
   }
 };
 
