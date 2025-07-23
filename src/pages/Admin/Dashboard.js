@@ -51,6 +51,43 @@ const Dashboard = () => {
     }
   };
 
+  // Simple click handlers for demo purposes
+  const handleSystemLogs = () => {
+    alert('System Logs: Redirecting to system logs page...');
+  };
+
+  const handleBackupDatabase = () => {
+    alert('Database Backup: Starting backup process...');
+  };
+
+  const handleConfigureSettings = () => {
+    alert('Settings: Opening system configuration...');
+  };
+
+  const handleManageUsers = () => {
+    alert('User Management: Redirecting to user management page...');
+  };
+
+  const handleExportUserData = () => {
+    alert('Export Data: Preparing user data export...');
+  };
+
+  const handleUserAnalytics = () => {
+    alert('Analytics: Loading user analytics dashboard...');
+  };
+
+  const handlePerformanceReport = () => {
+    alert('Performance Report: Generating performance report...');
+  };
+
+  const handleUsageAnalytics = () => {
+    alert('Usage Analytics: Loading usage statistics...');
+  };
+
+  const handleSecurityAudit = () => {
+    alert('Security Audit: Starting security audit process...');
+  };
+
 
 
   if (isLoading) {
@@ -198,13 +235,22 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">🔧 System Management</h3>
           <div className="space-y-3">
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+            <button 
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+              onClick={handleSystemLogs}
+            >
               View System Logs
             </button>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+            <button 
+              className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+              onClick={handleBackupDatabase}
+            >
               Backup Database
             </button>
-            <button className="w-full bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700">
+            <button 
+              className="w-full bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700 transition-colors"
+              onClick={handleConfigureSettings}
+            >
               Configure Settings
             </button>
           </div>
@@ -213,13 +259,22 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">👥 User Management</h3>
           <div className="space-y-3">
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+            <button 
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+              onClick={handleManageUsers}
+            >
               Manage Users
             </button>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+            <button 
+              className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+              onClick={handleExportUserData}
+            >
               Export User Data
             </button>
-            <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700">
+            <button 
+              className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors"
+              onClick={handleUserAnalytics}
+            >
               User Analytics
             </button>
           </div>
@@ -228,13 +283,22 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 Reports</h3>
           <div className="space-y-3">
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+            <button 
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+              onClick={handlePerformanceReport}
+            >
               Performance Report
             </button>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+            <button 
+              className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+              onClick={handleUsageAnalytics}
+            >
               Usage Analytics
             </button>
-            <button className="w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700">
+            <button 
+              className="w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors"
+              onClick={handleSecurityAudit}
+            >
               Security Audit
             </button>
           </div>
