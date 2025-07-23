@@ -158,10 +158,30 @@ const MediaPipeLiveAnalysis = ({
             }
             
             if (onRiskAnalysis) {
+              const overallLevel = [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('High Risk') ? 'high' : 
+                                 [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('Medium Risk') ? 'medium' : 'low';
+              
               onRiskAnalysis({
-                overall: [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('High Risk') ? 'high' : 
-                         [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('Medium Risk') ? 'medium' : 'low',
-                areas: []
+                overall: {
+                  level: overallLevel,
+                  score: overallLevel === 'high' ? 85 : overallLevel === 'medium' ? 60 : 30
+                },
+                shoulders: {
+                  level: shoulderRisk === 'High Risk' ? 'high' : shoulderRisk === 'Medium Risk' ? 'medium' : 'low',
+                  angle: shoulderAngle
+                },
+                elbows: {
+                  level: elbowRisk === 'High Risk' ? 'high' : elbowRisk === 'Medium Risk' ? 'medium' : 'low',
+                  angle: elbowAngle
+                },
+                hips: {
+                  level: hipRisk === 'High Risk' ? 'high' : hipRisk === 'Medium Risk' ? 'medium' : 'low',
+                  angle: hipAngle
+                },
+                knees: {
+                  level: kneeRisk === 'High Risk' ? 'high' : kneeRisk === 'Medium Risk' ? 'medium' : 'low',
+                  angle: kneeAngle
+                }
               });
             }
             
