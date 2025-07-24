@@ -88,6 +88,7 @@ const MediaPipeLiveAnalysis = ({
           // Draw the image
           canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
           
+          // Only process if pose landmarks are detected with sufficient confidence
           if (results.poseLandmarks && results.poseLandmarks.length > 0) {
             // Draw pose landmarks with more visible styling
             window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, 
@@ -134,55 +135,58 @@ const MediaPipeLiveAnalysis = ({
             );
             const kneeAngle = (leftKneeAngle + rightKneeAngle) / 2;
             
-            // Calculate risks with badminton-specific optimal ranges
-            const shoulderRisk = calculateRisk(shoulderAngle, 80, 150);
-            const elbowRisk = calculateRisk(elbowAngle, 120, 180);
-            const hipRisk = calculateRisk(hipAngle, 70, 130);
-            const kneeRisk = calculateRisk(kneeAngle, 130, 175);
-            
-            // Prepare metrics object
-            const metrics = {
-              shoulderRotation: shoulderAngle,
-              shoulderRisk: shoulderRisk,
-              elbowBend: elbowAngle,
-              elbowRisk: elbowRisk,
-              hipRotation: hipAngle,
-              hipRisk: hipRisk,
-              kneeAngle: kneeAngle,
-              kneeRisk: kneeRisk
-            };
-            
-            // Call parent callbacks
-            if (onJointAngles) {
-              onJointAngles(metrics);
-            }
-            
-            if (onRiskAnalysis) {
-              const overallLevel = [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('High Risk') ? 'high' : 
-                                 [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('Medium Risk') ? 'medium' : 'low';
+            // Only calculate risks if all angles are valid numbers
+            if (!isNaN(shoulderAngle) && !isNaN(elbowAngle) && !isNaN(hipAngle) && !isNaN(kneeAngle)) {
+              // Updated ranges for more realistic badminton movement assessment
+              const shoulderRisk = calculateRisk(shoulderAngle, 30, 170);  // Much wider range for normal shoulder movement
+              const elbowRisk = calculateRisk(elbowAngle, 90, 180);        // Allow for more elbow flexibility
+              const hipRisk = calculateRisk(hipAngle, 50, 150);            // Wider hip range for athletic movements
+              const kneeRisk = calculateRisk(kneeAngle, 120, 180);         // More realistic knee range
               
-              onRiskAnalysis({
-                overall: {
-                  level: overallLevel,
-                  score: overallLevel === 'high' ? 85 : overallLevel === 'medium' ? 60 : 30
-                },
-                shoulders: {
-                  level: shoulderRisk === 'High Risk' ? 'high' : shoulderRisk === 'Medium Risk' ? 'medium' : 'low',
-                  angle: shoulderAngle
-                },
-                elbows: {
-                  level: elbowRisk === 'High Risk' ? 'high' : elbowRisk === 'Medium Risk' ? 'medium' : 'low',
-                  angle: elbowAngle
-                },
-                hips: {
-                  level: hipRisk === 'High Risk' ? 'high' : hipRisk === 'Medium Risk' ? 'medium' : 'low',
-                  angle: hipAngle
-                },
-                knees: {
-                  level: kneeRisk === 'High Risk' ? 'high' : kneeRisk === 'Medium Risk' ? 'medium' : 'low',
-                  angle: kneeAngle
-                }
-              });
+              // Prepare metrics object
+              const metrics = {
+                shoulderRotation: shoulderAngle,
+                shoulderRisk: shoulderRisk,
+                elbowBend: elbowAngle,
+                elbowRisk: elbowRisk,
+                hipRotation: hipAngle,
+                hipRisk: hipRisk,
+                kneeAngle: kneeAngle,
+                kneeRisk: kneeRisk
+              };
+              
+              // Call parent callbacks only with valid data
+              if (onJointAngles) {
+                onJointAngles(metrics);
+              }
+              
+              if (onRiskAnalysis) {
+                const overallLevel = [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('High Risk') ? 'high' : 
+                                   [shoulderRisk, elbowRisk, hipRisk, kneeRisk].includes('Medium Risk') ? 'medium' : 'low';
+                
+                onRiskAnalysis({
+                  overall: {
+                    level: overallLevel,
+                    score: overallLevel === 'high' ? 85 : overallLevel === 'medium' ? 60 : 30
+                  },
+                  shoulders: {
+                    level: shoulderRisk === 'High Risk' ? 'high' : shoulderRisk === 'Medium Risk' ? 'medium' : 'low',
+                    angle: shoulderAngle
+                  },
+                  elbows: {
+                    level: elbowRisk === 'High Risk' ? 'high' : elbowRisk === 'Medium Risk' ? 'medium' : 'low',
+                    angle: elbowAngle
+                  },
+                  hips: {
+                    level: hipRisk === 'High Risk' ? 'high' : hipRisk === 'Medium Risk' ? 'medium' : 'low',
+                    angle: hipAngle
+                  },
+                  knees: {
+                    level: kneeRisk === 'High Risk' ? 'high' : kneeRisk === 'Medium Risk' ? 'medium' : 'low',
+                    angle: kneeAngle
+                  }
+                });
+              }
             }
             
             if (onPoseData) {
@@ -223,6 +227,9 @@ const MediaPipeLiveAnalysis = ({
                 landmarks[26].x * canvasElement.width + 10, 
                 landmarks[26].y * canvasElement.height);
             }
+          } else {
+            // No pose detected - don't call onJointAngles to prevent showing default risk values
+            // This ensures the InjurySummary component shows the placeholder message
           }
           
           canvasCtx.restore();
@@ -260,7 +267,7 @@ const MediaPipeLiveAnalysis = ({
   const calculateRisk = (angle, optimalMin, optimalMax) => {
     if (angle >= optimalMin && angle <= optimalMax) {
       return 'Safe';
-    } else if (angle >= optimalMin - 20 && angle <= optimalMax + 20) {
+    } else if (angle >= optimalMin - 30 && angle <= optimalMax + 30) {
       return 'Medium Risk';
     } else {
       return 'High Risk';

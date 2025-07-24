@@ -1,8 +1,18 @@
 import React from 'react';
 
 const InjurySummary = ({ jointAngles, riskData }) => {
-  // Don't render anything if no analysis data is available
-  if (!jointAngles) {
+  
+  // Enhanced check: Don't render risk data if no valid analysis is available
+  // Check if jointAngles is null, undefined, or doesn't contain valid risk data
+  if (!jointAngles || 
+      !jointAngles.shoulderRisk || 
+      !jointAngles.elbowRisk || 
+      !jointAngles.hipRisk || 
+      !jointAngles.kneeRisk ||
+      (typeof jointAngles.shoulderRotation !== 'number') ||
+      (typeof jointAngles.elbowBend !== 'number') ||
+      (typeof jointAngles.hipRotation !== 'number') ||
+      (typeof jointAngles.kneeAngle !== 'number')) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Injury Risk Summary</h2>
