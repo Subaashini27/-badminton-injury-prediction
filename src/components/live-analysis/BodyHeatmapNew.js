@@ -1,12 +1,12 @@
 import React from 'react';
 
 const BodyHeatmap = ({ jointAngles }) => {
-  // Define optimal angle ranges
+  // Define optimal angle ranges for badminton movements
   const optimalRanges = {
-    shoulder: { min: 90, max: 140 },
-    elbow: { min: 140, max: 170 },
-    hip: { min: 80, max: 120 },
-    knee: { min: 140, max: 165 },
+    shoulder: { min: 80, max: 150 },
+    elbow: { min: 120, max: 180 },
+    hip: { min: 70, max: 130 },
+    knee: { min: 130, max: 175 },
   };
 
   // Calculate risk based on angle and optimal range
@@ -14,7 +14,7 @@ const BodyHeatmap = ({ jointAngles }) => {
     if (angle === null || angle === undefined) return 'Safe';
     if (angle >= range.min && angle <= range.max) {
       return 'Safe';
-    } else if (angle >= range.min - 15 && angle <= range.max + 15) {
+    } else if (angle >= range.min - 20 && angle <= range.max + 20) {
       return 'Medium Risk';
     } else {
       return 'High Risk';

@@ -134,11 +134,11 @@ const MediaPipeLiveAnalysis = ({
             );
             const kneeAngle = (leftKneeAngle + rightKneeAngle) / 2;
             
-            // Calculate risks
-            const shoulderRisk = calculateRisk(shoulderAngle, 90, 140);
-            const elbowRisk = calculateRisk(elbowAngle, 140, 170);
-            const hipRisk = calculateRisk(hipAngle, 80, 120);
-            const kneeRisk = calculateRisk(kneeAngle, 140, 165);
+            // Calculate risks with badminton-specific optimal ranges
+            const shoulderRisk = calculateRisk(shoulderAngle, 80, 150);
+            const elbowRisk = calculateRisk(elbowAngle, 120, 180);
+            const hipRisk = calculateRisk(hipAngle, 70, 130);
+            const kneeRisk = calculateRisk(kneeAngle, 130, 175);
             
             // Prepare metrics object
             const metrics = {
@@ -256,11 +256,11 @@ const MediaPipeLiveAnalysis = ({
     return angle;
   };
 
-  // Calculate risk based on angle
+  // Calculate risk based on angle with improved ranges for badminton movements
   const calculateRisk = (angle, optimalMin, optimalMax) => {
     if (angle >= optimalMin && angle <= optimalMax) {
       return 'Safe';
-    } else if (angle >= optimalMin - 10 && angle <= optimalMax + 10) {
+    } else if (angle >= optimalMin - 20 && angle <= optimalMax + 20) {
       return 'Medium Risk';
     } else {
       return 'High Risk';
