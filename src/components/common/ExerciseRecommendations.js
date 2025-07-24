@@ -1,9 +1,22 @@
 import React from 'react';
 
 const ExerciseRecommendations = ({ jointAngles }) => {
+  // Don't render recommendations if no analysis data is available
+  if (!jointAngles) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-bold mb-4 text-gray-800">Exercise Recommendations</h2>
+        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+          <div className="text-center text-gray-500">
+            <p className="text-sm font-medium">Start analysis to get personalized exercises</p>
+            <p className="text-xs mt-1">Exercise recommendations will appear based on your movement analysis</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const getRecommendations = () => {
-    if (!jointAngles) return [];
-    
     const recommendations = [];
     
     // Shoulder recommendations
@@ -144,4 +157,4 @@ const ExerciseRecommendations = ({ jointAngles }) => {
   );
 };
 
-export default ExerciseRecommendations; 
+export default ExerciseRecommendations;

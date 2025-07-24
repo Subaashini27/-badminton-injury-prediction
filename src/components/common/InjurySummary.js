@@ -1,10 +1,23 @@
 import React from 'react';
 
 const InjurySummary = ({ jointAngles, riskData }) => {
+  // Don't render anything if no analysis data is available
+  if (!jointAngles) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-bold mb-4 text-gray-800">Injury Risk Summary</h2>
+        <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+          <div className="text-center text-gray-500">
+            <p className="text-sm font-medium">Start analysis to see risk assessment</p>
+            <p className="text-xs mt-1">Risk levels will appear here once pose detection begins</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Get risk levels for each joint
   const getRiskSummary = () => {
-    if (!jointAngles) return { high: [], medium: [], safe: [] };
-    
     const summary = { high: [], medium: [], safe: [] };
     
     if (jointAngles.shoulderRisk === 'High Risk') summary.high.push('Shoulders');
@@ -100,4 +113,4 @@ const InjurySummary = ({ jointAngles, riskData }) => {
   );
 };
 
-export default InjurySummary; 
+export default InjurySummary;
